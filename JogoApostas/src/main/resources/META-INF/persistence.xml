@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+             https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+
+    <!-- Arquivo de configuração do hibernate -->
+
+    <!-- grupo de configurações com um nome.
+    O nome JogoApostasPU vai ser usado no código Java para iniciar o Hibernate.
+    RESOURCE_LOCAL significa que você controla as transações manualmente no código, sem servidor de aplicação -->
+    <persistence-unit name="JogoApostasPU" transaction-type="RESOURCE_LOCAL">
+
+        <properties>
+            <!-- Conexão com o banco -->
+            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/db_apostas?useSSL=false&amp;serverTimezone=UTC"/>
+            <property name="jakarta.persistence.jdbc.user" value="root"/>
+            <property name="jakarta.persistence.jdbc.password" value="${DB_PASSWORD}"/> <!-- senha como variável de ambiente -->
+
+            <!-- Hibernate -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/> <!-- Mostra pro hibernate que o banco-->
+            <property name="hibernate.hbm2ddl.auto" value="update"/> <!--  Diz o que o Hibernate faz com as tabelas ao iniciar: atualiza -->
+            <property name="hibernate.show_sql" value="true"/> <!-- Mostra no console o SQL que o Hibernate está executando, formatado e legível. -->
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+
+    </persistence-unit>
+
+</persistence>
