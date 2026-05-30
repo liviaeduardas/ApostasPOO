@@ -2,15 +2,16 @@ package Model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import jakarta.persistence.*;
 
+
+@Entity
+@DiscriminatorValue("REGULAR") //identifica essa classe na coluna tipo_partida
 public class PartidaRegular extends Partida{
 
     public PartidaRegular() {
     }
 
-    public PartidaRegular(Clube clubeMandante, Clube clubeVisitante, LocalDate data, LocalTime hora, int golMandante, int golVisitante, boolean encerrada) {
-        super(clubeMandante, clubeVisitante, data, hora, 0, 0, false);
-    }
 
     public PartidaRegular(Clube clubeMandante, Clube clubeVisitante, LocalDate data, LocalTime hora) {
         super(clubeMandante, clubeVisitante, data, hora, 0, 0, false);

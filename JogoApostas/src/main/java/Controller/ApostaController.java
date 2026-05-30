@@ -47,7 +47,7 @@ public class ApostaController {
         for (Aposta a : apostas) {
             if (campeonato.getPartidas().contains(a.getPartida()) && a.getPartida().isEncerrada()) {
                 int pontos = a.calcularPontuacao();
-                a.getParticipante().setPontosTotal(a.getParticipante().getPontosTotal() + pontos);
+                a.getParticipante().setTotalPontos(a.getParticipante().getTotalPontos() + pontos);
             }
         }
     }

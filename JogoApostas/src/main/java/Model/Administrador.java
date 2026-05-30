@@ -1,6 +1,15 @@
 package Model;
 
+import jakarta.persistence.*;
+
+//vira tabela no banco
+@Entity
+
+//identifica essa classe na coluna tipo_usuario
+@DiscriminatorValue("ADMIN")
+
 public class Administrador extends Usuario{
+    @Column(name = "nivel_acesso")
     private String nivelAesso;
 
     public Administrador(){

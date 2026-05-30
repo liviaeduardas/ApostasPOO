@@ -22,7 +22,7 @@ public class GrupoController {
             return false;
         }
 
-        Grupo novoGrupo = new Grupo(proximo++, nome.trim(), null);
+        Grupo novoGrupo = new Grupo(proximo++, nome.trim());
         grupos.add(novoGrupo);
         return true;
     }

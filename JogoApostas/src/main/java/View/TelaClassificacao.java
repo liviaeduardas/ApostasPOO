@@ -161,7 +161,7 @@ public class TelaClassificacao extends JPanel {
 
         for (int i = 0; i < ranking.size(); i++) {
             Participante p = ranking.get(i);
-            modeloTabela.addRow(new Object[]{(i + 1) + "º", p.getNome(), p.getPontosTotal() + " pts"});
+            modeloTabela.addRow(new Object[]{(i + 1) + "º", p.getNome(), p.getTotalPontos() + " pts"});
         }
         labelInfo.setText("Total: " + ranking.size() + " participante(s)");
     }

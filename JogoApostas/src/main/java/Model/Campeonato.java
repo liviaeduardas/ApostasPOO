@@ -1,13 +1,40 @@
 package Model;
+
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+//tabela no banco
+@Entity
+@Table(name = "campeonatos")
 public class Campeonato {
-    private static final int MAX_CLUBES = 8;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // banco gera automático
+    private int id;
+
+    // nullable não pode ser nulo | length é o tamanho máximo do texto
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
+
+    @Column(name = "ano", nullable = false)
     private int ano;
+
+    // Um campeonato tem vários clubes e um clube pode estar em vários campeonatos
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "campeonato_clubes", //hibernate cria tabela intermediária
+            joinColumns = @JoinColumn(name = "campeonato_id"),  // chave do campeonato
+            inverseJoinColumns = @JoinColumn(name = "clube_id") // chave do clube
+    )
     private List<Clube> clubes;
+
+    // Um campeonato tem várias partidas
+    @OneToMany( //define relação entre a tabela
+            mappedBy = "campeonato", // na campeonato partidas terá um atributo campeonato
+            cascade = CascadeType.ALL, // defini que deve fazer  tudo com uma tabela o que ocorrer com a outra
+            fetch = FetchType.LAZY)// apostas são carregadas do banco so quando chamar
     private List<Partida> partidas;
+
 
     public Campeonato(){
         this.clubes = new ArrayList<>();
@@ -22,7 +49,7 @@ public class Campeonato {
     }
 
     public boolean adicionarClube(Clube clube) {
-        if (clubes.size() >= MAX_CLUBES) {
+        if (clubes.size() >= 8) {
             System.out.println("Limite máximo de 8 clubes atingido");
             return false;
         }
@@ -84,7 +111,7 @@ public class Campeonato {
     }
 
     public int getMaxClubes() {
-        return MAX_CLUBES;
+        return 8;
     }
 
 }
