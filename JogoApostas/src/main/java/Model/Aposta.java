@@ -1,15 +1,37 @@
 package Model;
 import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
-public class Aposta implements Ipontuavel {
+@Entity
+@Table(name = "apostas")
+public class Aposta implements ICalcularPontos {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //banco gera autoático
     private int idAposta;
+
+    // Muitas apostas pertencem a um participante
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "participante_id", nullable = false)
     private Participante participante;
+
+    // Muitas apostas pertencem a uma partida
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partida_id", nullable = false)
     private Partida partida;
+
+    @Column(name = "gols_mandante_palpite", nullable = false)
     private int golsMandantePalpite;
+
+    @Column(name = "gols_visitante_palpite", nullable = false)
     private int golsVisitantePalpite;
+
+    @Column(name = "data_hora_aposta")
     private LocalDateTime dataHoraAposta;
+
+    @Column(name = "pontuacao_obtida")
     private int pontuacaoObtida;
 
+    public Aposta(){}
     public Aposta(int idAposta, Participante participante, Partida partida, int golsMandantePalpite, int golsVisitantePalpite) {
         this.idAposta = idAposta;
         this.participante = participante;

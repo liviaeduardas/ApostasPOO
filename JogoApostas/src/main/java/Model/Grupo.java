@@ -1,21 +1,36 @@
 package Model;
 
+import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name = "grupos")
 public class Grupo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // banco gera id automático
     private int id;
+
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
-    private String criador;
+
+    // Um grupo tem vários participantes e um participante pode estar em vários grupos
+    @ManyToMany(fetch = FetchType.LAZY) // grupos são carregadas do banco so quando chamar
+    @JoinTable(
+            name = "grupo_participantes",                        // nome da tabela intermediária
+            joinColumns = @JoinColumn(name = "grupo_id"),        // chave do grupo
+            inverseJoinColumns = @JoinColumn(name = "participante_id") // chave do participante
+    )
     private ArrayList<Participante> participantes;
 
     public Grupo(){
         this.participantes = new ArrayList<>();
     }
 
-    public Grupo(int id, String nome, String criador) {
+    public Grupo(int id, String nome) {
         this.id = id;
         this.nome = nome;
-        this.criador = criador;
         this.participantes = new ArrayList<>();
     }
 
@@ -32,7 +47,7 @@ public class Grupo {
 
     public ArrayList<Participante> getRancking(){
         ArrayList<Participante> ranking = new ArrayList<>(participantes);
-        ranking.sort((p1, p2) -> p2.getPontosTotal() - p1.getPontosTotal());
+        ranking.sort((p1, p2) -> p2.getTotalPontos() - p1.getTotalPontos());
         return ranking;
     }
 
@@ -55,14 +70,6 @@ public class Grupo {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public String getCriador() {
-        return criador;
-    }
-
-    public void setCriador(String criador) {
-        this.criador = criador;
     }
 
     public ArrayList<Participante> getParticipantes() {
