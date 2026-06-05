@@ -1,5 +1,4 @@
 package Model;
-
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.List;
 @Entity
 @Table(name = "campeonatos")
 public class Campeonato {
+    private static final int MAX_CLUBES = 8;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // banco gera automático
     private int id;
@@ -35,7 +35,6 @@ public class Campeonato {
             fetch = FetchType.LAZY)// apostas são carregadas do banco so quando chamar
     private List<Partida> partidas;
 
-
     public Campeonato(){
         this.clubes = new ArrayList<>();
         this.partidas = new ArrayList<>();
@@ -48,21 +47,37 @@ public class Campeonato {
         this.partidas = new ArrayList<>();
     }
 
-    public boolean adicionarClube(Clube clube) {
-        if (clubes.size() >= 8) {
+    public boolean AddCLube(Clube clube) {
+        if (clubes.size() >= MAX_CLUBES) {
             System.out.println("Limite máximo de 8 clubes atingido");
             return false;
         }
-        if (clubes.contains(clube)) {
-            System.out.println("Clube já cadastrado no campeonato.");
-            return false;
+
+        for (Clube c : clubes) {
+            if (c == clube) {
+                System.out.println("Clube já cadastrado no campeonato.");
+                return false;
+            }
         }
         clubes.add(clube);
         return true;
     }
 
-    public boolean adicionarPartida(Partida partida) {
-        if (!clubes.contains(partida.getClubeMandante()) || !clubes.contains(partida.getClubeVisitante())) {
+    public boolean AddPartida(Partida partida) {
+        boolean CasaExiste = false;
+        boolean VisitanteExiste = false;
+
+        for (Clube clube : clubes) {
+            if (clube == partida.getClubeCasa()) {
+                CasaExiste = true;
+            }
+
+            if (clube == partida.getClubeVisitante()) {
+                VisitanteExiste = true;
+            }
+        }
+
+        if (!CasaExiste || !VisitanteExiste) {
             System.out.println("Clube não pertence ao campeonato");
             return false;
         }
@@ -70,48 +85,50 @@ public class Campeonato {
         return true;
     }
 
-    public List<Partida> getPartidasPendentes() {
-        List<Partida> pendentes = new ArrayList<>();
-        for (Partida p : partidas) {
-            if (!p.isEncerrada()) pendentes.add(p);
+    public boolean PartidasNaoFinalizadas() {
+        for (Partida partida : partidas) {
+            if (!partida.isPartidaFinalizada()) {
+                return true;
+            }
         }
-        return pendentes;
+        return false;
     }
 
-    public List<Partida> getPartidasFinalizadas() {
-        List<Partida> finalizadas = new ArrayList<>();
-        for (Partida p : partidas) {
-            if (p.isEncerrada()) finalizadas.add(p);
+    public boolean PartidasFinalizadas() {
+        for (Partida partida : partidas) {
+            if (partida.isPartidaFinalizada()) {
+                return true;
+            }
         }
-        return finalizadas;
+        return false;
     }
 
-    public String getNome() {
+    public String getNome(){
         return nome;
     }
 
-    public void setNome(String nome) {
+    public void setNome(String nome){
         this.nome = nome;
     }
 
-    public int getAno() {
+    public int getAno(){
         return ano;
     }
 
-    public void setAno(int ano) {
+    public void setAno(int ano){
         this.ano = ano;
     }
 
-    public List<Clube> getClubes() {
+    public List<Clube> getClubes(){
         return clubes;
     }
 
-    public List<Partida> getPartidas() {
+    public List<Partida> getPartidas(){
         return partidas;
     }
 
     public int getMaxClubes() {
-        return 8;
+        return MAX_CLUBES;
     }
 
 }

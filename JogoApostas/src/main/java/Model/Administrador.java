@@ -1,5 +1,4 @@
 package Model;
-
 import jakarta.persistence.*;
 
 //vira tabela no banco
@@ -10,27 +9,27 @@ import jakarta.persistence.*;
 
 public class Administrador extends Usuario{
     @Column(name = "nivel_acesso")
-    private String nivelAesso;
+    private String nivelAcesso;
 
     public Administrador(){
         super();
-        this.nivelAesso = "TOTAL";
+        this.nivelAcesso = "TOTAL";
     }
 
     public Administrador(int id, String senha, String usuario, String nome) {
         super(id, senha, usuario, nome);
-        this.nivelAesso = "TOTAL";
+        this.nivelAcesso = "TOTAL";
     }
 
     public void autenticar(){
         System.out.println("Administrador autenticado: " + getNome());
     }
 
-    public String getNivelAesso() {
-        return nivelAesso;
+    public String getNivelAcesso(){
+        return nivelAcesso;
     }
 
-    public void setNivelAesso(String nivelAesso) {
-        this.nivelAesso = nivelAesso;
+    public void setNivelAcesso(String nivelAcesso){
+        this.nivelAcesso = nivelAcesso;
     }
 }

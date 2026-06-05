@@ -1,5 +1,4 @@
 package Model;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import jakarta.persistence.*;
@@ -13,8 +12,7 @@ import jakarta.persistence.*;
 //coluna discriminadora dizendo qual tipo é cada linha.
 @DiscriminatorColumn(name = "tipo_partida", discriminatorType = DiscriminatorType.STRING)
 
-public abstract class Partida {
-
+public class Partida {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -30,98 +28,107 @@ public abstract class Partida {
     @ManyToOne(fetch = FetchType.LAZY)
     //@JoinColumn — define o nome da coluna da chave estrangeira no banco.
     @JoinColumn(name = "clube_mandante_id", nullable = false)
-    private Clube clubeMandante;
+    private Clube ClubeCasa;
 
     // Clube que joga fora
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clube_visitante_id", nullable = false)
-    private Clube clubeVisitante;
+    private Clube ClubeVisitante;
 
     @Column(name = "data_partida", nullable = false)
-    private LocalDate data;
+    private LocalDate DataPartida;
 
     @Column(name = "hora_partida", nullable = false)
-    private LocalTime hora;
+    private LocalTime HoraPartida;
 
     @Column(name = "gol_mandante")
-    private int golMandante;
+    private int GolsCasa;
 
     @Column(name = "gol_visitante")
-    private int golVisitante;
+    private int GolsVisitante;
 
     @Column(name = "encerrada")
-    private boolean encerrada;
+    private boolean PartidaFinalizada;
 
     public Partida() {
-        this.golMandante  = 0;
-        this.golVisitante = 0;
-        this.encerrada    = false;
+        this.GolsCasa = 0;
+        this.GolsVisitante = 0;
+        this.PartidaFinalizada = false;
     }
 
-    public Partida(Clube clubeMandante, Clube clubeVisitante, LocalDate data, LocalTime hora, int golMandante, int golVisitante, boolean encerrada) {
-        this.clubeMandante = clubeMandante;
-        this.clubeVisitante = clubeVisitante;
-        this.data = data;
-        this.hora = hora;
-        this.golMandante = 0;
-        this.golVisitante = 0;
-        this.encerrada = false;
+    public Partida(Clube ClubeCasa, Clube ClubeVisitante, LocalDate DataPartida, LocalTime HoraPartida) {
+        this.ClubeCasa = ClubeCasa;
+        this.ClubeVisitante = ClubeVisitante;
+        this.DataPartida = DataPartida;
+        this.HoraPartida = HoraPartida;
+        this.GolsCasa = 0;
+        this.GolsVisitante = 0;
+        this.PartidaFinalizada = false;
     }
 
-    public Clube getClubeMandante() {
-        return clubeMandante;
+    public Clube getClubeCasa(){
+        return ClubeCasa;
     }
-    public void setClubeMandante(Clube clubeMandante) {
-        this.clubeMandante = clubeMandante;
-    }
-
-    public Clube getClubeVisitante() {
-        return clubeVisitante;
-    }
-    public void setClubeVisitante(Clube clubeVisitante) {
-        this.clubeVisitante = clubeVisitante;
+    public void setClubeCasa(Clube ClubeCasa){
+        this.ClubeCasa = ClubeCasa;
     }
 
-    public LocalDate getData() {
-        return data;
+    public Clube getClubeVisitante(){
+        return ClubeVisitante;
     }
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
-
-    public LocalTime getHora() {
-        return hora;
-    }
-    public void setHora(LocalTime hora) {
-        this.hora = hora;
+    public void setClubeVisitante(Clube ClubeVisitante){
+        this.ClubeVisitante = ClubeVisitante;
     }
 
-    public int getGolMandante() {
-        return golMandante;
+    public LocalDate getDataPartida(){
+        return DataPartida;
     }
-    public void setGolMandante(int golMandante) {
-        this.golMandante = golMandante;
-    }
-
-    public int getGolVisitante() {
-        return golVisitante;
-    }
-    public void setGolVisitante(int golVisitante) {
-        this.golVisitante = golVisitante;
+    public void setDataPartida(LocalDate DataPartida){
+        this.DataPartida = DataPartida;
     }
 
-    public boolean isEncerrada() {
-        return encerrada;
+    public LocalTime getHoraPartida(){
+        return HoraPartida;
     }
-    public void setEncerrada(boolean encerrada) {
-        this.encerrada = encerrada;
-    }
-
-    public void registrarResultado(int golMandante, int golVisitante){
-        this.golVisitante = golVisitante;
-        this.golMandante = golMandante;
-        this.encerrada = true;
+    public void setHoraPartida(LocalTime HoraPartida){
+        this.HoraPartida = HoraPartida;
     }
 
-    public abstract String getResultado();
+    public int getGolsCasa(){
+        return GolsCasa;
+    }
+    public void setGolsCasa(int GolsCasa){
+        this.GolsCasa = GolsCasa;
+    }
+
+    public int getGolsVisitante(){
+        return GolsVisitante;
+    }
+    public void setGolsVisitante(int GolsVisitante){
+        this.GolsVisitante = GolsVisitante;
+    }
+
+    public boolean isPartidaFinalizada(){
+        return PartidaFinalizada;
+    }
+    public void setPartidaFinalizada(boolean PartidaFinalizada){
+        this.PartidaFinalizada = PartidaFinalizada;
+    }
+
+    public void ResultadoFinal(int GolsCasa, int GolsVisitante){
+        this.GolsVisitante = GolsVisitante;
+        this.GolsCasa = GolsCasa;
+        this.PartidaFinalizada = true;
+    }
+
+    public int getResultado(){
+        if (GolsCasa > GolsVisitante) {
+            return 1; //casa venceu
+        }
+
+        if (GolsCasa < GolsVisitante) {
+            return 2; //visitante venceu
+        }
+        return 0; //empate
+    }
 }

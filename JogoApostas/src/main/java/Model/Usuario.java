@@ -1,9 +1,8 @@
 package Model;
-
 import jakarta.persistence.*;
 
 //diz ao Hibernate que essa classe não vira tabela, mas seus atributos são herdados pelas subclasses que são @Entity
-@MappedSuperclass
+@Entity
 
 //define como a herança é mapeada no banco. SINGLE_TABLE = uma só tabela para todas as subclasses
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -13,7 +12,6 @@ import jakarta.persistence.*;
 
 
 public abstract class Usuario {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // faz o banco gerar id automático
     private int id;
@@ -38,33 +36,31 @@ public abstract class Usuario {
 
     public abstract void autenticar();
 
-    public int getId() {
+    public int getId(){
         return id;
     }
-    public void setId(int id) {
+    public void setId(int id){
         this.id = id;
     }
 
-    public String getNome() {
+    public String getNome(){
         return nome;
     }
-    public void setNome(String nome) {
+    public void setNome(String nome){
         this.nome = nome;
     }
 
-    public String getUsuario() {
+    public String getUsuario(){
         return usuario;
     }
-    public void setUsuario(String usuario) {
+    public void setUsuario(String usuario){
         this.usuario = usuario;
     }
 
-    public String getSenha() {
+    public String getSenha(){
         return senha;
     }
-    public void setSenha(String senha) {
+    public void setSenha(String senha){
         this.senha = senha;
     }
-
-
 }

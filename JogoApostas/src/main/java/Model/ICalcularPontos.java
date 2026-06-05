@@ -1,8 +1,7 @@
 package Model;
 
 public interface ICalcularPontos {
-
-    int calcularPontuacao();
+    int CalcularResultadoAposta();
 }
 
 
