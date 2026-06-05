@@ -1,5 +1,4 @@
 package Model;
-
 import jakarta.persistence.*;
 
 /**
@@ -10,7 +9,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "clubes")
 public class Clube {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // faz o banco gerar id automático
     private int id;
@@ -27,19 +25,22 @@ public class Clube {
         this.sigla = sigla;
     }
 
-    public String getNome() {
+    public Clube() {
+    }
+
+    public String getNome(){
         return nome;
     }
 
-    public void setNome(String nome) {
+    public void setNome(String nome){
         this.nome = nome;
     }
 
-    public String getSigla() {
+    public String getSigla(){
         return sigla;
     }
 
-    public void setSigla(String sigla) {
+    public void setSigla(String sigla){
         this.sigla = sigla;
     }
 

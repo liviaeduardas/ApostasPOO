@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "apostas")
-public class Aposta implements ICalcularPontos {
+public class Aposta implements ICalcularPontos{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //banco gera autoático
     private int idAposta;
@@ -20,114 +20,123 @@ public class Aposta implements ICalcularPontos {
     private Partida partida;
 
     @Column(name = "gols_mandante_palpite", nullable = false)
-    private int golsMandantePalpite;
+    private int PalpiteGolsCasa;
 
     @Column(name = "gols_visitante_palpite", nullable = false)
-    private int golsVisitantePalpite;
+    private int PalpiteGolsVsitante;
 
     @Column(name = "data_hora_aposta")
-    private LocalDateTime dataHoraAposta;
+    private LocalDateTime TempoApostar;
 
     @Column(name = "pontuacao_obtida")
-    private int pontuacaoObtida;
+    private int PontosObtidos;
 
-    public Aposta(){}
-    public Aposta(int idAposta, Participante participante, Partida partida, int golsMandantePalpite, int golsVisitantePalpite) {
+    public Aposta(){
+    }
+
+    public Aposta(int idAposta, Participante participante, Partida partida, int PalpiteGolsCasa, int PalpiteGolsVsitante) {
         this.idAposta = idAposta;
         this.participante = participante;
         this.partida = partida;
-        this.golsMandantePalpite = golsMandantePalpite;
-        this.golsVisitantePalpite = golsVisitantePalpite;
-        this.dataHoraAposta = LocalDateTime.now();
-        this.pontuacaoObtida = 0;
+        this.PalpiteGolsCasa = PalpiteGolsCasa;
+        this.PalpiteGolsVsitante = PalpiteGolsVsitante;
+        this.TempoApostar = LocalDateTime.now();
+        this.PontosObtidos = 0;
     }
 
-    public boolean podeApostar() {
-        LocalDateTime dataHoraPartida = LocalDateTime.of(partida.getData(), partida.getHora());
-        LocalDateTime limiteAposta = dataHoraPartida.minusMinutes(20);
-        return LocalDateTime.now().isBefore(limiteAposta);
+    public boolean PossivelApostar(){
+        LocalDateTime horarioPartida = LocalDateTime.of(partida.getDataPartida(), partida.getHoraPartida());
+        LocalDateTime limiteAposta = horarioPartida.minusMinutes(20);
+
+        if (LocalDateTime.now().isBefore(limiteAposta)){
+            return true;
+        }
+        return false;
     }
 
-    private String getResultadoPalpite() {
-        if (golsMandantePalpite > golsVisitantePalpite){
-            return "Mandante";
+    private int getResultadoPalpitePartida() {
+        if (PalpiteGolsCasa > PalpiteGolsVsitante){
+            return 1; //casa
         }
-        if (golsMandantePalpite < golsVisitantePalpite){
-            return "Visitante";
+        if (PalpiteGolsCasa < PalpiteGolsVsitante){
+            return 2; //visitante
         }
-        return "Empate";
+        return 0; //empate
     }
 
 
     @Override
-    public int calcularPontuacao() {
-        if (!partida.isEncerrada()) {
+    public int CalcularResultadoAposta() {
+        if (!partida.isPartidaFinalizada()) {
             return 0;
         }
+        int ResultadoCerto = partida.getResultado();
+        int ResultadoPalpite = getResultadoPalpitePartida();
 
-        String resultadoReal = partida.getResultado();
-        String resultadoPalpite = getResultadoPalpite();
-
-        if (golsMandantePalpite == partida.getGolMandante() && golsVisitantePalpite == partida.getGolVisitante()) {
-            this.pontuacaoObtida = 10;
+        if (PalpiteGolsCasa == partida.getGolsCasa() && PalpiteGolsVsitante == partida.getGolsVisitante()){
+            this.PontosObtidos = 10;
             return 10;
         }
 
-        if (resultadoPalpite.equals(resultadoReal)) {
-            this.pontuacaoObtida = 5;
+        if (ResultadoPalpite == ResultadoCerto) {
+            this.PontosObtidos = 5;
             return 5;
         }
 
-        this.pontuacaoObtida = 0;
+        this.PontosObtidos = 0;
         return 0;
     }
 
-    public int getIdAposta() {
+    public int getIdAposta(){
         return idAposta;
     }
 
-    public void setIdAposta(int idAposta) {
+    public void setIdAposta(int idAposta){
         this.idAposta = idAposta;
     }
 
-    public Participante getParticipante() {
+    public Participante getParticipante(){
         return participante;
     }
 
-    public void setParticipante(Participante participante) {
+    public void setParticipante(Participante participante){
         this.participante = participante;
     }
 
-    public Partida getPartida() {
+    public Partida getPartida(){
         return partida;
     }
 
-    public void setPartida(Partida partida) {
+    public void setPartida(Partida partida){
         this.partida = partida;
     }
 
-    public int getGolsMandantePalpite() {
-        return golsMandantePalpite;
+    public int getPalpiteGolsCasa(){
+        return PalpiteGolsCasa;
     }
 
-    public void setGolsMandantePalpite(int golsMandantePalpite) {
-        this.golsMandantePalpite = golsMandantePalpite;
+    public void setPalpiteGolsCasa(int palpiteGolsCasa){
+        this.PalpiteGolsCasa = palpiteGolsCasa;
     }
 
-    public int getGolsVisitantePalpite() {
-        return golsVisitantePalpite;
+    public int getPalpiteGolsVsitante(){
+        return PalpiteGolsVsitante;
     }
 
-    public void setGolsVisitantePalpite(int golsVisitantePalpite) {
-        this.golsVisitantePalpite = golsVisitantePalpite;
+    public void setPalpiteGolsVsitante(int palpiteGolsVsitante){
+        this.PalpiteGolsVsitante = palpiteGolsVsitante;
     }
 
-    public LocalDateTime getData() {
-        return dataHoraAposta;
+    public LocalDateTime getTempoApostar(){
+        return TempoApostar;
     }
 
-    public int getPontuacaoObtida() {
-        return pontuacaoObtida;
+    public int getPontosObtidos(){
+        return PontosObtidos;
+    }
+
+    public void setPontosObtidos(int pontosObtidos){
+        this.PontosObtidos = pontosObtidos;
     }
 
 }

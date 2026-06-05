@@ -1,5 +1,4 @@
 package Model;
-
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +6,6 @@ import java.util.List;
 @Entity
 @Table(name = "grupos")
 public class Grupo {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // banco gera id automático
     private int id;
@@ -45,38 +43,45 @@ public class Grupo {
         }
     }
 
-    public ArrayList<Participante> getRancking(){
+    public ArrayList<Participante> getRanking() {
         ArrayList<Participante> ranking = new ArrayList<>(participantes);
-        ranking.sort((p1, p2) -> p2.getTotalPontos() - p1.getTotalPontos());
+        for (int i = 0; i < ranking.size(); i++) {
+            for (int j = i + 1; j < ranking.size(); j++) {
+                if (ranking.get(j).getTotalPontos() > ranking.get(i).getTotalPontos()) {
+                    Participante aux = ranking.get(i);
+                    ranking.set(i, ranking.get(j));
+                    ranking.set(j, aux);
+                }
+            }
+        }
         return ranking;
     }
 
     public String toString(){
-        return "Grupo " + this.nome + " | Participantes: " + participantes.size() + "/5";
+        return "Grupo " + this.nome + " - Participantes: " + participantes.size() + "/5";
     }
 
-
-    public int getId() {
+    public int getId(){
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(int id){
         this.id = id;
     }
 
-    public String getNome() {
+    public String getNome(){
         return nome;
     }
 
-    public void setNome(String nome) {
+    public void setNome(String nome){
         this.nome = nome;
     }
 
-    public ArrayList<Participante> getParticipantes() {
+    public ArrayList<Participante> getParticipantes(){
         return participantes;
     }
 
-    public void setParticipantes(ArrayList<Participante> participantes) {
+    public void setParticipantes(ArrayList<Participante> participantes){
         this.participantes = participantes;
     }
 }
