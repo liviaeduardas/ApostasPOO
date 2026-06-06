@@ -6,50 +6,35 @@ import java.util.ArrayList;
 
 public class GrupoController {
     private ArrayList<Grupo> grupos;
-    private static final int maximo = 5;
-    private int proximo;
 
-    public GrupoController(){
-        this.grupos = new ArrayList<>();
-        this.proximo = 1;
+    public GrupoController() {
+        grupos = new ArrayList<>();
     }
 
-    public boolean criarGrupo(String nome, Administrador criador) {
-        if (nome == null || nome.trim().isEmpty()) {
-            return false;
-        }
+    public boolean criarGrupo(String nome) {
         if (grupos.size() >= 5) {
+            System.out.println("Limite de grupos atingido.");
             return false;
         }
-
-        Grupo novoGrupo = new Grupo(proximo++, nome.trim());
-        grupos.add(novoGrupo);
+        Grupo grupo = new Grupo(0, nome);
+        grupos.add(grupo);
         return true;
     }
 
-
-
-    public boolean adicionarParticipante(Grupo grupo, Participante participante){
-        if(grupo == null || participante == null){
-            return false;
-        }
+    public boolean addParticipante(Grupo grupo, Participante participante) {
         return grupo.addParticipante(participante);
     }
 
-    public ArrayList<Participante> getRanking(Grupo grupo){
-        if(grupo == null){
-            return new ArrayList<>();
-        }
-        return grupo.getRancking();
+    public ArrayList<Participante> getRanking(Grupo grupo) {
+        return grupo.getRanking();
     }
 
-    public Grupo buscarNome(String nome){
-        for(Grupo g: grupos){
-            if(g.getNome().equalsIgnoreCase(nome.trim())){
-                return g;
+    public Grupo BuscarNome(String nome) {
+        for (Grupo grupo : grupos) {
+            if (grupo.getNome().equalsIgnoreCase(nome)) {
+                return grupo;
             }
         }
-
         return null;
     }
 
@@ -57,4 +42,3 @@ public class GrupoController {
         return grupos;
     }
 }
-

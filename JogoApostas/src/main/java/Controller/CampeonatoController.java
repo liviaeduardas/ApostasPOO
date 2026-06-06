@@ -13,7 +13,7 @@ public class CampeonatoController {
         this.clubes = new ArrayList<>();
     }
 
-    public boolean criarCampeonato(String nome, int ano) {
+    public boolean NovoCampeonato(String nome, int ano) {
         if (nome == null || nome.trim().isEmpty()) {
             return false;
         }
@@ -22,7 +22,7 @@ public class CampeonatoController {
         return true;
     }
 
-    public boolean cadastrarClube(String nome, String sigla) {
+    public boolean CadastrarClube(String nome, String sigla) {
         if (nome == null || nome.trim().isEmpty()) {
             return false;
         }
@@ -34,21 +34,21 @@ public class CampeonatoController {
         return true;
     }
 
-    public boolean adicionarClubeCampeonato(Campeonato campeonato, Clube clube) {
+    public boolean AddClube(Campeonato campeonato, Clube clube) {
         if (campeonato == null || clube == null) {
             return false;
         }
-        return campeonato.adicionarClube(clube);
+        return campeonato.AddClube(clube);
     }
 
-    public boolean adicionarPartidaCampeonato(Campeonato campeonato, Partida partida) {
+    public boolean AddPartida(Campeonato campeonato, Partida partida) {
         if (campeonato == null || partida == null) {
             return false;
         }
-        return campeonato.adicionarPartida(partida);
+        return campeonato.AddPartida(partida);
     }
 
-    public Campeonato buscarNome(String nome) {
+    public Campeonato ProcurarCampeonato(String nome) {
         for (Campeonato c : campeonatos) {
             if (c.getNome().equalsIgnoreCase(nome.trim())) {
                 return c;
@@ -57,7 +57,7 @@ public class CampeonatoController {
         return null;
     }
 
-    public Clube buscarClubeSigla(String sigla) {
+    public Clube ProcurarClube(String sigla) {
         for (Clube c : clubes) {
             if (c.getSigla().equalsIgnoreCase(sigla.trim())) {
                 return c;
@@ -66,11 +66,11 @@ public class CampeonatoController {
         return null;
     }
 
-    public ArrayList<Campeonato> getCampeonatos() {
+    public ArrayList<Campeonato> getCampeonatos(){
         return campeonatos;
     }
 
-    public ArrayList<Clube> getClubes() {
+    public ArrayList<Clube> getClubes(){
         return clubes;
     }
 }

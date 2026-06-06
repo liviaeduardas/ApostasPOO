@@ -26,14 +26,14 @@ public class TelaCadastro extends JPanel {
     private JComboBox<String> comboCampeonatoClube;
 
     private JComboBox<String> comboCampeonatoPartida;
-    private JComboBox<String> comboMandante;
+    private JComboBox<String> comboCasa;
     private JComboBox<String> comboVisitante;
     private JTextField campoData;
     private JTextField campoHora;
 
     private JComboBox<String> comboCampeonatoResultado;
     private JComboBox<String> comboPartidaResultado;
-    private JTextField campoGolsMandante;
+    private JTextField campoGolsCasa;
     private JTextField campoGolsVisitante;
 
     private static final Color VERMELHO = new Color(0x95, 0x0E, 0x17);
@@ -250,10 +250,10 @@ public class TelaCadastro extends JPanel {
 
         gbc.gridx = 0; gbc.gridy = 1; gbc.insets = new Insets(10, 0, 2, 16);
         painel.add(new JLabel("Mandante:"), gbc);
-        comboMandante = new JComboBox<>();
-        comboMandante.setPreferredSize(new Dimension(260, 34));
+        comboCasa = new JComboBox<>();
+        comboCasa.setPreferredSize(new Dimension(260, 34));
         gbc.gridx = 1; gbc.insets = new Insets(10, 0, 2, 0);
-        painel.add(comboMandante, gbc);
+        painel.add(comboCasa, gbc);
 
         gbc.gridx = 0; gbc.gridy = 2; gbc.insets = new Insets(10, 0, 2, 16);
         painel.add(new JLabel("Visitante:"), gbc);
@@ -309,10 +309,10 @@ public class TelaCadastro extends JPanel {
 
         gbc.gridx = 0; gbc.gridy = 2; gbc.insets = new Insets(10, 0, 2, 16);
         painel.add(new JLabel("Gols mandante:"), gbc);
-        campoGolsMandante = new JTextField();
-        campoGolsMandante.setPreferredSize(new Dimension(260, 34));
+        campoGolsCasa = new JTextField();
+        campoGolsCasa.setPreferredSize(new Dimension(260, 34));
         gbc.gridx = 1; gbc.insets = new Insets(10, 0, 2, 0);
-        painel.add(campoGolsMandante, gbc);
+        painel.add(campoGolsCasa, gbc);
 
         gbc.gridx = 0; gbc.gridy = 3; gbc.insets = new Insets(10, 0, 2, 16);
         painel.add(new JLabel("Gols visitante:"), gbc);
@@ -334,7 +334,7 @@ public class TelaCadastro extends JPanel {
         String anoStr = campoCampeonatoAno.getText().trim();
         try {
             int ano = Integer.parseInt(anoStr);
-            boolean criou = campeonatoController.criarCampeonato(nome, ano);
+            boolean criou = campeonatoController.NovoCampeonato(nome, ano);
             if (criou) {
                 JOptionPane.showMessageDialog(mainFrame, "Campeonato criado com sucesso!");
                 campoCampeonatoNome.setText("");
@@ -351,17 +351,17 @@ public class TelaCadastro extends JPanel {
         String nome = campoClubeNome.getText().trim();
         String sigla = campoClubeSigla.getText().trim();
         String nomeCampeonato = (String) comboCampeonatoClube.getSelectedItem();
-        Campeonato campeonato = campeonatoController.buscarNome(nomeCampeonato);
+        Campeonato campeonato = campeonatoController.BuscarNome(nomeCampeonato);
         if (campeonato == null) return;
 
-        boolean cadastrou = campeonatoController.cadastrarClube(nome, sigla);
+        boolean cadastrou = campeonatoController.CadastrarClube(nome, sigla);
         if (!cadastrou) {
             JOptionPane.showMessageDialog(mainFrame, "Erro ao cadastrar clube!", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        Clube clube = campeonatoController.buscarClubeSigla(sigla);
-        boolean adicionou = campeonatoController.adicionarClubeCampeonato(campeonato, clube);
+        Clube clube = campeonatoController.ProcurarClube(sigla);
+        boolean adicionou = campeonatoController.CadastrarClube(campeonato, clube);
         if (adicionou) {
             JOptionPane.showMessageDialog(mainFrame, "Clube cadastrado com sucesso!");
             campoClubeNome.setText("");
@@ -373,7 +373,7 @@ public class TelaCadastro extends JPanel {
 
     private void cadastrarPartida() {
         String nomeCampeonato = (String) comboCampeonatoPartida.getSelectedItem();
-        String nomeMandante = (String) comboMandante.getSelectedItem();
+        String nomeMandante = (String) comboCasa.getSelectedItem();
         String nomeVisitante = (String) comboVisitante.getSelectedItem();
         String dataStr = campoData.getText().trim();
         String horaStr = campoHora.getText().trim();
@@ -389,9 +389,9 @@ public class TelaCadastro extends JPanel {
             String[] ph = horaStr.split(":");
             LocalTime hora = LocalTime.of(Integer.parseInt(ph[0]), Integer.parseInt(ph[1]));
 
-            Campeonato campeonato = campeonatoController.buscarNome(nomeCampeonato);
-            Clube mandante = campeonatoController.buscarClubeSigla(nomeMandante);
-            Clube visitante = campeonatoController.buscarClubeSigla(nomeVisitante);
+            Campeonato campeonato = campeonatoController.BuscarNome(nomeCampeonato);
+            Clube mandante = campeonatoController.ProcurarClube(nomeMandante);
+            Clube visitante = campeonatoController.ProcurarClube(nomeVisitante);
 
             boolean cadastrou = partidaController.cadastrarPartida(campeonato, mandante, visitante, data, hora);
             if (cadastrou) {
@@ -409,14 +409,14 @@ public class TelaCadastro extends JPanel {
     private void registrarResultado() {
         String nomePartida = (String) comboPartidaResultado.getSelectedItem();
         String nomeCampeonato = (String) comboCampeonatoResultado.getSelectedItem();
-        String golsMStr = campoGolsMandante.getText().trim();
+        String golsMStr = campoGolsCasa.getText().trim();
         String golsVStr = campoGolsVisitante.getText().trim();
 
         try {
             int golsM = Integer.parseInt(golsMStr);
             int golsV = Integer.parseInt(golsVStr);
 
-            Campeonato campeonato = campeonatoController.buscarNome(nomeCampeonato);
+            Campeonato campeonato = campeonatoController.BuscarNome(nomeCampeonato);
             if (campeonato == null) return;
 
             Model.Partida partida = null;
@@ -428,11 +428,11 @@ public class TelaCadastro extends JPanel {
             }
             if (partida == null) return;
 
-            boolean registrou = partidaController.registrarResultado(partida, golsM, golsV);
+            boolean registrou = partidaController.AddResultado(partida, golsC, golsV);
             if (registrou) {
-                mainFrame.getApostaController().calcularPontuacoes(campeonato);
+                mainFrame.getApostaController().CalcularPontos(campeonato);
                 JOptionPane.showMessageDialog(mainFrame, "Resultado registrado! Pontuações calculadas.");
-                campoGolsMandante.setText("");
+                campoGolsCasa.setText("");
                 campoGolsVisitante.setText("");
                 atualizarPartidasResultado();
             } else {
@@ -451,14 +451,14 @@ public class TelaCadastro extends JPanel {
     }
 
     private void atualizarClubesPartida() {
-        comboMandante.removeAllItems();
+        comboCasa.removeAllItems();
         comboVisitante.removeAllItems();
         String nomeCampeonato = (String) comboCampeonatoPartida.getSelectedItem();
         if (nomeCampeonato == null) return;
         Campeonato campeonato = campeonatoController.buscarNome(nomeCampeonato);
         if (campeonato == null) return;
         for (Clube c : campeonato.getClubes()) {
-            comboMandante.addItem(c.getSigla());
+            comboCasa.addItem(c.getSigla());
             comboVisitante.addItem(c.getSigla());
         }
     }

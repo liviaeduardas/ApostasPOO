@@ -12,14 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TelaApostas extends JPanel {
-
     private MainFrame mainFrame;
     private ApostaController apostaController;
     private CampeonatoController campeonatoController;
 
     private JComboBox<String> comboCampeonato;
     private JComboBox<String> comboPartida;
-    private JTextField campoGolsMandante;
+    private JTextField campoGolsCasa;
     private JTextField campoGolsVisitante;
     private JLabel labelBemVindo;
     private JLabel labelInfo;
@@ -131,10 +130,10 @@ public class TelaApostas extends JPanel {
 
         gbc.gridx = 0; gbc.gridy = 3; gbc.insets = new Insets(10, 0, 2, 16); gbc.fill = GridBagConstraints.NONE;
         direita.add(new JLabel("Gols mandante:"), gbc);
-        campoGolsMandante = new JTextField();
-        campoGolsMandante.setPreferredSize(new Dimension(260, 34));
+        campoGolsCasa = new JTextField();
+        campoGolsCasa.setPreferredSize(new Dimension(260, 34));
         gbc.gridx = 1; gbc.insets = new Insets(10, 0, 2, 0); gbc.fill = GridBagConstraints.HORIZONTAL;
-        direita.add(campoGolsMandante, gbc);
+        direita.add(campoGolsCasa, gbc);
 
         gbc.gridx = 0; gbc.gridy = 4; gbc.insets = new Insets(10, 0, 2, 16); gbc.fill = GridBagConstraints.NONE;
         direita.add(new JLabel("Gols visitante:"), gbc);
@@ -152,7 +151,7 @@ public class TelaApostas extends JPanel {
         direita.add(labelInfo, gbc);
 
         JButton botaoApostar = criarBotaoAcao("Registrar Aposta");
-        botaoApostar.addActionListener(e -> registrarAposta());
+        botaoApostar.addActionListener(e -> FazerAposta());
         gbc.gridy = 6;
         gbc.insets = new Insets(10, 0, 0, 0);
         gbc.fill = GridBagConstraints.NONE;
@@ -185,12 +184,12 @@ public class TelaApostas extends JPanel {
         return botao;
     }
 
-    private void registrarAposta() {
+    private void FazerAposta() {
         Participante participante = mainFrame.getParticipanteLogado();
         if (participante == null) return;
 
         String nomePartida = (String) comboPartida.getSelectedItem();
-        String golsMStr = campoGolsMandante.getText().trim();
+        String golsMStr = campoGolsCasa.getText().trim();
         String golsVStr = campoGolsVisitante.getText().trim();
 
         if (nomePartida == null || golsMStr.isEmpty() || golsVStr.isEmpty()) {
@@ -199,17 +198,17 @@ public class TelaApostas extends JPanel {
         }
 
         try {
-            int golsM = Integer.parseInt(golsMStr);
+            int golsC = Integer.parseInt(golsMStr);
             int golsV = Integer.parseInt(golsVStr);
 
             Partida partida = buscarPartidaPorString(nomePartida);
             if (partida == null) return;
 
-            boolean apostou = apostaController.registrarAposta(participante, partida, golsM, golsV);
+            boolean apostou = apostaController.registrarAposta(participante, partida, golsC, golsV);
 
             if (apostou) {
-                JOptionPane.showMessageDialog(mainFrame, "Aposta registrada! Palpite: " + golsM + " x " + golsV);
-                campoGolsMandante.setText("");
+                JOptionPane.showMessageDialog(mainFrame, "Aposta registrada! Palpite: " + golsC + " x " + golsV);
+                campoGolsCasa.setText("");
                 campoGolsVisitante.setText("");
                 labelInfo.setText(" ");
             } else {
@@ -235,7 +234,7 @@ public class TelaApostas extends JPanel {
         StringBuilder sb = new StringBuilder();
         for (Model.Aposta a : apostas) {
             sb.append("Partida: ").append(a.getPartida().toString()).append("\n");
-            sb.append("Palpite: ").append(a.getGolsMandantePalpite()).append(" x ").append(a.getGolsVisitantePalpite()).append("\n");
+            sb.append("Palpite: ").append(a.getPalpiteGolsCasa()).append(" x ").append(a.getGPalpiteGolsVisitante()).append("\n");
             sb.append("Pontos: ").append(a.getPontuacaoObtida()).append("\n");
             sb.append("---------------------\n");
         }
@@ -297,8 +296,8 @@ public class TelaApostas extends JPanel {
 
         if (escolhido == null) return;
 
-        Model.Grupo grupo = mainFrame.getGrupoController().buscarNome(escolhido);
-        boolean entrou = mainFrame.getGrupoController().adicionarParticipante(grupo, participante);
+        Model.Grupo grupo = mainFrame.getGrupoController().BuscarNome(escolhido);
+        boolean entrou = mainFrame.getGrupoController().AddParticipante(grupo, participante);
 
         if (entrou) {
             JOptionPane.showMessageDialog(mainFrame, "Você entrou no grupo!");
@@ -311,7 +310,7 @@ public class TelaApostas extends JPanel {
         comboPartida.removeAllItems();
         String nomeCampeonato = (String) comboCampeonato.getSelectedItem();
         if (nomeCampeonato == null) return;
-        Campeonato campeonato = campeonatoController.buscarNome(nomeCampeonato);
+        Campeonato campeonato = campeonatoController.BuscarNome(nomeCampeonato);
         if (campeonato == null) return;
         for (Partida p : campeonato.getPartidasPendentes()) {
             comboPartida.addItem(p.toString());
@@ -339,7 +338,7 @@ public class TelaApostas extends JPanel {
         atualizarPartidas();
         labelInfo.setText(" ");
 
-        campoGolsMandante.setText("");
+        campoGolsCasa.setText("");
         campoGolsVisitante.setText("");
     }
 }
