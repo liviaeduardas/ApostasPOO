@@ -19,14 +19,12 @@ public class ApostaController {
 
         // Cria a aposta corretamente — id 0 pois o banco vai gerar automaticamente
         Aposta aposta = new Aposta(0, participante, partida, GolsCasa, GolsVisitante);
-
         if (!aposta.possivelApostar()) return false;
 
         // Verifica duplicata — mesmo participante na mesma partida
         for (Aposta a : apostas) {
             if (a.getParticipante() == participante && a.getPartida() == partida) return false;
         }
-
         apostas.add(aposta);
         participante.fazerAposta(aposta);
         return true;
@@ -34,8 +32,7 @@ public class ApostaController {
 
     public void CalcularPontos(Campeonato campeonato) {
         for (Aposta aposta : apostas) {
-            if (campeonato.getPartidas().contains(aposta.getPartida())
-                    && aposta.getPartida().isPartidaFinalizada()) {
+            if (campeonato.getPartidas().contains(aposta.getPartida()) && aposta.getPartida().isPartidaFinalizada()) {
                 aposta.calcularResultadoAposta();
             }
         }
