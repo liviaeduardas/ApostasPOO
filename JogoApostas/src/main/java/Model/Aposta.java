@@ -20,16 +20,18 @@ public class Aposta implements ICalcularPontos{
     private Partida partida;
 
     @Column(name = "gols_mandante_palpite", nullable = false)
-    private int PalpiteGolsCasa;
+    private int palpiteGolsCasa;
+
 
     @Column(name = "gols_visitante_palpite", nullable = false)
-    private int PalpiteGolsVsitante;
+    private int palpiteGolsVsitante;
 
     @Column(name = "data_hora_aposta")
-    private LocalDateTime TempoApostar;
+    private LocalDateTime tempoApostar;
 
     @Column(name = "pontuacao_obtida")
-    private int PontosObtidos;
+    private int pontosObtidos;
+
 
     public Aposta(){
     }
@@ -38,13 +40,13 @@ public class Aposta implements ICalcularPontos{
         this.idAposta = idAposta;
         this.participante = participante;
         this.partida = partida;
-        this.PalpiteGolsCasa = PalpiteGolsCasa;
-        this.PalpiteGolsVsitante = PalpiteGolsVsitante;
-        this.TempoApostar = LocalDateTime.now();
-        this.PontosObtidos = 0;
+        this.palpiteGolsCasa = PalpiteGolsCasa;
+        this.palpiteGolsVsitante = PalpiteGolsVsitante;
+        this.tempoApostar = LocalDateTime.now();
+        this.pontosObtidos = 0;
     }
 
-    public boolean PossivelApostar(){
+    public boolean possivelApostar(){
         LocalDateTime horarioPartida = LocalDateTime.of(partida.getDataPartida(), partida.getHoraPartida());
         LocalDateTime limiteAposta = horarioPartida.minusMinutes(20);
 
@@ -55,35 +57,34 @@ public class Aposta implements ICalcularPontos{
     }
 
     private int getResultadoPalpitePartida() {
-        if (PalpiteGolsCasa > PalpiteGolsVsitante){
+        if (palpiteGolsCasa > palpiteGolsVsitante){
             return 1; //casa
         }
-        if (PalpiteGolsCasa < PalpiteGolsVsitante){
+        if (palpiteGolsCasa < palpiteGolsVsitante){
             return 2; //visitante
         }
         return 0; //empate
     }
 
-
     @Override
-    public int CalcularResultadoAposta() {
+    public int calcularResultadoAposta() {
         if (!partida.isPartidaFinalizada()) {
             return 0;
         }
         int ResultadoCerto = partida.getResultado();
         int ResultadoPalpite = getResultadoPalpitePartida();
 
-        if (PalpiteGolsCasa == partida.getGolsCasa() && PalpiteGolsVsitante == partida.getGolsVisitante()){
-            this.PontosObtidos = 10;
+        if (palpiteGolsCasa == partida.getGolsCasa() && palpiteGolsVsitante == partida.getGolsVisitante()){
+            this.pontosObtidos = 10;
             return 10;
         }
 
         if (ResultadoPalpite == ResultadoCerto) {
-            this.PontosObtidos = 5;
+            this.pontosObtidos = 5;
             return 5;
         }
 
-        this.PontosObtidos = 0;
+        this.pontosObtidos = 0;
         return 0;
     }
 
@@ -112,31 +113,31 @@ public class Aposta implements ICalcularPontos{
     }
 
     public int getPalpiteGolsCasa(){
-        return PalpiteGolsCasa;
+        return palpiteGolsCasa;
     }
 
     public void setPalpiteGolsCasa(int palpiteGolsCasa){
-        this.PalpiteGolsCasa = palpiteGolsCasa;
+        this.palpiteGolsCasa = palpiteGolsCasa;
     }
 
     public int getPalpiteGolsVsitante(){
-        return PalpiteGolsVsitante;
+        return palpiteGolsVsitante;
     }
 
     public void setPalpiteGolsVsitante(int palpiteGolsVsitante){
-        this.PalpiteGolsVsitante = palpiteGolsVsitante;
+        this.palpiteGolsVsitante = palpiteGolsVsitante;
     }
 
     public LocalDateTime getTempoApostar(){
-        return TempoApostar;
+        return tempoApostar;
     }
 
     public int getPontosObtidos(){
-        return PontosObtidos;
+        return pontosObtidos;
     }
 
     public void setPontosObtidos(int pontosObtidos){
-        this.PontosObtidos = pontosObtidos;
+        this.pontosObtidos = pontosObtidos;
     }
 
 }

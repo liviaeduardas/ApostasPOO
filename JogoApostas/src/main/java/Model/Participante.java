@@ -29,7 +29,7 @@ public class Participante extends Usuario {
         System.out.println("Participante autenticado: " + getNome());
     }
 
-    public void FazerAposta(Aposta aposta){
+    public void fazerAposta(Aposta aposta){
         apostas.add(aposta);
     }
 
@@ -39,6 +39,7 @@ public class Participante extends Usuario {
             total += aposta.getPontosObtidos();
         }
         return total;
+
     }
 
     public List<Aposta> getApostas(){

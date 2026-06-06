@@ -12,6 +12,20 @@
     RESOURCE_LOCAL significa que você controla as transações manualmente no código, sem servidor de aplicação -->
     <persistence-unit name="JogoApostasPU" transaction-type="RESOURCE_LOCAL">
 
+        <!-- ===== Entidades que o Hibernate deve gerenciar ===== -->
+        <class>Model.Usuario</class>
+        <class>Model.Administrador</class>
+        <class>Model.Participante</class>
+        <class>Model.Clube</class>
+        <class>Model.Campeonato</class>
+        <class>Model.Partida</class>
+        <class>Model.PartidaRegular</class>
+        <class>Model.Aposta</class>
+        <class>Model.Grupo</class>
+
+        <!-- Impede o Hibernate de tentar adivinhar outras classes no classpath -->
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
         <properties>
             <!-- Conexão com o banco -->
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
