@@ -29,7 +29,7 @@ public class Participante extends Usuario {
         System.out.println("Participante autenticado: " + getNome());
     }
 
-    public void registrarAposta(Aposta aposta){
+    public void FazerAposta(Aposta aposta){
         apostas.add(aposta);
     }
 

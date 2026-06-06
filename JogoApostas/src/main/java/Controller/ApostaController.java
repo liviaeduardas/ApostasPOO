@@ -1,62 +1,58 @@
 package Controller;
 import Model.Aposta;
-import Model.Campeonato;
 import Model.Participante;
 import Model.Partida;
-
 import java.util.ArrayList;
 
 public class ApostaController {
     private ArrayList<Aposta> apostas;
-    private int proximoId;
 
     public ApostaController() {
         this.apostas = new ArrayList<>();
-        this.proximoId = 1;
     }
 
-    public boolean registrarAposta(Participante participante, Partida partida, int golsMandante, int golsVisitante) {
+    public boolean FazerAposta(Participante participante, Partida partida, int GolsCasa, int GolsVisitante) {
         if (participante == null || partida == null) {
             return false;
         }
-        if (golsMandante < 0 || golsVisitante < 0) {
-            return false;
-        }
-        if (partida.isEncerrada()) {
+
+        if (GolsCasa < 0 || GolsVisitante < 0) {
             return false;
         }
 
-        Aposta aposta = new Aposta(proximoId++, participante, partida, golsMandante, golsVisitante);
+        if (partida.isPartidaFinalizada()) {
+            return false;
+        }
 
-        if (!aposta.podeApostar()) {
+        Aposta aposta = new Aposta(int idAposta, Participante, Partida, int, int);
+
+        if (!aposta.PossivelApostar()) {
             return false;
         }
 
         for (Aposta a : apostas) {
-            if (a.getParticipante().equals(participante) && a.getPartida().equals(partida)) {
+            if (a.getParticipante() == participante && a.getPartida() == partida) {
                 return false;
             }
         }
-
         apostas.add(aposta);
-        participante.registrarAposta(aposta);
+        participante.FazerAposta(aposta);
         return true;
     }
 
-    public void calcularPontuacoes(Campeonato campeonato) {
-        for (Aposta a : apostas) {
-            if (campeonato.getPartidas().contains(a.getPartida()) && a.getPartida().isEncerrada()) {
-                int pontos = a.calcularPontuacao();
-                a.getParticipante().setTotalPontos(a.getParticipante().getTotalPontos() + pontos);
+    public void CalcularPontos() {
+        for (Aposta aposta : apostas) {
+            if (aposta.getPartida().isPartidaFinalizada()) {
+                aposta.CalcularResultadoAposta();
             }
         }
     }
 
     public ArrayList<Aposta> getApostasPorParticipante(Participante participante) {
         ArrayList<Aposta> resultado = new ArrayList<>();
-        for (Aposta a : apostas) {
-            if (a.getParticipante().equals(participante)) {
-                resultado.add(a);
+        for (Aposta aposta : apostas) {
+            if (aposta.getParticipante() == participante) {
+                resultado.add(aposta);
             }
         }
         return resultado;
@@ -64,9 +60,9 @@ public class ApostaController {
 
     public ArrayList<Aposta> getApostasPorPartida(Partida partida) {
         ArrayList<Aposta> resultado = new ArrayList<>();
-        for (Aposta a : apostas) {
-            if (a.getPartida().equals(partida)) {
-                resultado.add(a);
+        for (Aposta aposta : apostas) {
+            if (aposta.getPartida() == partida) {
+                resultado.add(aposta);
             }
         }
         return resultado;

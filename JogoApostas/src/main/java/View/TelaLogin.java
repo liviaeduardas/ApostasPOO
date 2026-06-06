@@ -1,5 +1,5 @@
 package View;
-import Controller.LoginController;
+import Controller.UsuarioController;
 import Model.Administrador;
 import Model.Participante;
 import Model.Usuario;

@@ -3,42 +3,37 @@ import Model.Campeonato;
 import Model.Clube;
 import Model.Partida;
 import Model.PartidaRegular;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class PartidaController {
-
-    public boolean cadastrarPartida(Campeonato campeonato, Clube clubeMandante, Clube clubeVisitante, LocalDate data, LocalTime hora) {
-        if (campeonato == null || clubeMandante == null || clubeVisitante == null) {
+    public boolean cadastrarPartida(Campeonato campeonato, Clube ClubeCasa, Clube ClubeVisitante, LocalDate DataPartida, LocalTime HoraPartida){
+        if (campeonato == null || ClubeCasa == null || ClubeVisitante == null) {
             return false;
         }
-        if (clubeMandante.equals(clubeVisitante)) {
+        if (ClubeCasa.equals(ClubeVisitante)) {
             return false;
         }
-        if (data == null || hora == null) {
+        if (DataPartida == null || HoraPartida == null) {
             return false;
         }
-
-        PartidaRegular nova = new PartidaRegular(clubeMandante, clubeVisitante, data, hora);
-        return campeonato.adicionarPartida(nova);
+        PartidaRegular nova = new PartidaRegular(ClubeCasa, ClubeVisitante, DataPartida, HoraPartida);
+        return campeonato.AddPartida(nova);
     }
 
-    public boolean registrarResultado(Partida partida, int golMandante, int golVisitante) {
+    public boolean AddResultado(Partida partida, int GolsCasa, int GolsVisitante) {
         if (partida == null) {
             return false;
         }
-        if (partida.isEncerrada()) {
+        if (partida.isPartidaFinalizada()) {
             return false;
         }
-        if (golMandante < 0 || golVisitante < 0) {
+        if (GolsCasa < 0 || GolsVisitante < 0) {
             return false;
         }
-
-        partida.registrarResultado(golMandante, golVisitante);
+        partida.ResultadoFinal(GolsCasa, GolsVisitante);
         return true;
     }
 
@@ -56,12 +51,12 @@ public class PartidaController {
         return campeonato.getPartidasFinalizadas();
     }
 
-    public Partida buscarPartida(Campeonato campeonato, Clube clubeMandante, Clube clubeVisitante) {
-        if (campeonato == null || clubeMandante == null || clubeVisitante == null) {
+    public Partida ProcurarPartida(Campeonato campeonato, Clube ClubeCasa, Clube ClubeVisitante) {
+        if (campeonato == null || ClubeCasa == null || ClubeVisitante == null) {
             return null;
         }
         for (Partida p : campeonato.getPartidas()) {
-            if (p.getClubeMandante().equals(clubeMandante) && p.getClubeVisitante().equals(clubeVisitante)) {
+            if (p.getClubeCasa() == ClubeCasa && p.getClubeVisitante() == ClubeVisitante){
                 return p;
             }
         }

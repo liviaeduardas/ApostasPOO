@@ -6,11 +6,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
-
     private CardLayout cardLayout;
     private JPanel painelPrincipal;
 
-    private LoginController loginController;
+    private UsuarioController usuarioController;
     private GrupoController grupoController;
     private CampeonatoController campeonatoController;
     private PartidaController partidaController;
@@ -26,7 +25,7 @@ public class MainFrame extends JFrame {
     private TelaCadastro telaCadastro;
 
     public MainFrame() {
-        loginController = new LoginController();
+        usuarioController = new UsuarioController();
         grupoController = new GrupoController();
         campeonatoController = new CampeonatoController();
         partidaController = new PartidaController();
@@ -34,7 +33,7 @@ public class MainFrame extends JFrame {
 
         cardLayout = new CardLayout();
         painelPrincipal = new JPanel(cardLayout);
-        telaLogin = new TelaLogin(this, loginController);
+        telaLogin = new TelaLogin(this, usuarioController);
         telaClassificacao = new TelaClassificacao(this, grupoController);
         telaCadastro = new TelaCadastro(this, campeonatoController, partidaController);
         telaApostas = new TelaApostas(this, apostaController, campeonatoController);
@@ -70,39 +69,39 @@ public class MainFrame extends JFrame {
         }
     }
 
-    public void setParticipanteLogado(Participante participante) {
+    public void setParticipanteLogado(Participante participante){
         this.participanteLogado = participante;
     }
 
-    public Participante getParticipanteLogado() {
+    public Participante getParticipanteLogado(){
         return participanteLogado;
     }
 
-    public void setAdminLogado(Administrador admin) {
+    public void setAdminLogado(Administrador admin){
         this.adminLogado = admin;
     }
 
-    public Administrador getAdminLogado() {
+    public Administrador getAdminLogado(){
         return adminLogado;
     }
 
-    public LoginController getLoginController() {
-        return loginController;
+    public UsuarioController getUsuarioController(){
+        return usuarioController;
     }
 
-    public GrupoController getGrupoController() {
+    public GrupoController getGrupoController(){
         return grupoController;
     }
 
-    public CampeonatoController getCampeonatoController() {
+    public CampeonatoController getCampeonatoController(){
         return campeonatoController;
     }
 
-    public PartidaController getPartidaController() {
+    public PartidaController getPartidaController(){
         return partidaController;
     }
 
-    public ApostaController getApostaController() {
+    public ApostaController getApostaController(){
         return apostaController;
     }
 }
