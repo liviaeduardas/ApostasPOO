@@ -1,221 +1,117 @@
 package View;
-import Controller.ApostaController;
+
 import Controller.CampeonatoController;
-import Controller.PartidaController;
 import Model.Campeonato;
 import Model.Partida;
+
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
 
 public class TelaResultados extends JPanel {
-    private MainFrame mainFrame;
-    private PartidaController partidaController;
-    private CampeonatoController campeonatoController;
-    private ApostaController apostaController;
 
-    private JComboBox<String> comboCampeonato;
-    private JPanel painelConteudo;
-    private CardLayout cardLayout;
+    private MainFrame main;
+    private CampeonatoController campCtrl;
 
-    private javax.swing.table.DefaultTableModel modeloPendentes;
-    private javax.swing.table.DefaultTableModel modeloFinalizadas;
-    private JTable tabelaPendentes;
-    private JTable tabelaFinalizadas;
+    private JComboBox<String> comboCamp;
+    private JTable tabela;
+    private DefaultTableModel modelo;
 
-    private static final Color VERMELHO = new Color(0x95, 0x0E, 0x17);
-    private static final Color VERMELHO_ESC = new Color(0x70, 0x0A, 0x11);
-    private static final Color FUNDO = new Color(0xFF, 0xF5, 0xF5);
+    public TelaResultados(MainFrame main, CampeonatoController campCtrl) {
+        this.main = main;
+        this.campCtrl = campCtrl;
 
-    public TelaResultados(MainFrame mainFrame, PartidaController partidaController,
-                          CampeonatoController campeonatoController, ApostaController apostaController) {
-        this.mainFrame = mainFrame;
-        this.partidaController = partidaController;
-        this.campeonatoController = campeonatoController;
-        this.apostaController = apostaController;
-        inicializarComponentes();
-    }
-
-    private void inicializarComponentes() {
         setLayout(new BorderLayout());
-        setBackground(FUNDO);
 
-        JPanel lateral = new JPanel();
-        lateral.setLayout(new BoxLayout(lateral, BoxLayout.Y_AXIS));
-        lateral.setBackground(VERMELHO);
-        lateral.setPreferredSize(new Dimension(180, 0));
-        lateral.setBorder(new EmptyBorder(30, 0, 20, 0));
+        JPanel topo = new JPanel();
 
-        JLabel sistema = new JLabel("Sistema", SwingConstants.CENTER);
-        sistema.setFont(new Font("Arial", Font.BOLD, 18));
-        sistema.setForeground(Color.WHITE);
-        sistema.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lateral.add(sistema);
+        JLabel titulo = new JLabel("Resultados");
+        JButton voltar = new JButton("Voltar");
 
-        JLabel sub = new JLabel("Resultados", SwingConstants.CENTER);
-        sub.setFont(new Font("Arial", Font.PLAIN, 12));
-        sub.setForeground(new Color(0xFF, 0xCC, 0xCC));
-        sub.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lateral.add(sub);
+        voltar.addActionListener(e ->
+                main.trocarTela("telaApostas"));
 
-        lateral.add(Box.createVerticalStrut(30));
+        topo.add(titulo);
+        topo.add(voltar);
 
-        JSeparator sep = new JSeparator();
-        sep.setMaximumSize(new Dimension(140, 1));
-        sep.setForeground(new Color(0xAA, 0x33, 0x33));
-        sep.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lateral.add(sep);
-        lateral.add(Box.createVerticalStrut(20));
+        add(topo, BorderLayout.NORTH);
 
-        JButton btnPendentes = criarBotaoMenu("Aguardando");
-        btnPendentes.addActionListener(e -> cardLayout.show(painelConteudo, "pendentes"));
-        lateral.add(btnPendentes);
-        lateral.add(Box.createVerticalStrut(4));
+        JPanel centro = new JPanel();
 
-        JButton btnFinalizadas = criarBotaoMenu("Finalizadas");
-        btnFinalizadas.addActionListener(e -> cardLayout.show(painelConteudo, "finalizadas"));
-        lateral.add(btnFinalizadas);
-        lateral.add(Box.createVerticalStrut(4));
+        centro.add(new JLabel("Campeonato:"));
 
-        JButton btnAtualizar = criarBotaoMenu("Atualizar");
-        btnAtualizar.addActionListener(e -> atualizar());
-        lateral.add(btnAtualizar);
-        lateral.add(Box.createVerticalGlue());
+        comboCamp = new JComboBox<>();
+        comboCamp.addActionListener(e -> atualizarTabela());
 
-        JButton botaoVoltar = criarBotaoMenu("Voltar");
-        botaoVoltar.setForeground(new Color(0xFF, 0xCC, 0xCC));
-        botaoVoltar.addActionListener(e -> mainFrame.trocarTela("telaApostas"));
-        lateral.add(botaoVoltar);
-        lateral.add(Box.createVerticalStrut(10));
+        centro.add(comboCamp);
 
-        add(lateral, BorderLayout.WEST);
+        add(centro, BorderLayout.SOUTH);
 
-        JPanel direita = new JPanel(new BorderLayout());
-        direita.setBackground(FUNDO);
-        direita.setBorder(new EmptyBorder(30, 30, 30, 30));
+        modelo = new DefaultTableModel();
+        modelo.addColumn("Mandante");
+        modelo.addColumn("Visitante");
+        modelo.addColumn("Placar");
+        modelo.addColumn("Resultado");
 
-        JLabel titulo = new JLabel("Resultados das Partidas");
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
-        titulo.setForeground(VERMELHO);
-        direita.add(titulo, BorderLayout.NORTH);
+        tabela = new JTable(modelo);
 
-        JPanel painelGrupo = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 10));
-        painelGrupo.setBackground(FUNDO);
-        painelGrupo.add(new JLabel("Campeonato: "));
-        comboCampeonato = new JComboBox<>();
-        comboCampeonato.setFont(new Font("Arial", Font.PLAIN, 13));
-        comboCampeonato.setPreferredSize(new Dimension(200, 32));
-        comboCampeonato.addActionListener(e -> atualizarTabelas());
-        painelGrupo.add(comboCampeonato);
-
-        cardLayout     = new CardLayout();
-        painelConteudo = new JPanel(cardLayout);
-        painelConteudo.setBackground(FUNDO);
-
-        String[] colunasPendentes = {"Mandante", "Visitante", "Data", "Hora"};
-        modeloPendentes = new javax.swing.table.DefaultTableModel(colunasPendentes, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-        tabelaPendentes = new JTable(modeloPendentes);
-        estilizarTabela(tabelaPendentes);
-        JScrollPane scrollPendentes = new JScrollPane(tabelaPendentes);
-        scrollPendentes.getViewport().setBackground(FUNDO);
-        painelConteudo.add(scrollPendentes, "pendentes");
-
-        String[] colunasFinalizadas = {"Mandante", "Visitante", "Placar", "Resultado"};
-        modeloFinalizadas = new javax.swing.table.DefaultTableModel(colunasFinalizadas, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-        tabelaFinalizadas = new JTable(modeloFinalizadas);
-        estilizarTabela(tabelaFinalizadas);
-        JScrollPane scrollFinalizadas = new JScrollPane(tabelaFinalizadas);
-        scrollFinalizadas.getViewport().setBackground(FUNDO);
-        painelConteudo.add(scrollFinalizadas, "finalizadas");
-
-        JPanel painelCentro = new JPanel(new BorderLayout(0, 10));
-        painelCentro.setBackground(FUNDO);
-        painelCentro.add(painelGrupo, BorderLayout.NORTH);
-        painelCentro.add(painelConteudo, BorderLayout.CENTER);
-
-        direita.add(painelCentro, BorderLayout.CENTER);
-        add(direita, BorderLayout.CENTER);
+        add(new JScrollPane(tabela), BorderLayout.CENTER);
     }
 
-    private void estilizarTabela(JTable tabela) {
-        tabela.setFont(new Font("Arial", Font.PLAIN, 13));
-        tabela.setRowHeight(28);
-        tabela.setForeground(Color.BLACK);
-        tabela.setBackground(FUNDO);
-        tabela.getTableHeader().setFont(new Font("Arial", Font.BOLD, 13));
-        tabela.getTableHeader().setBackground(VERMELHO);
-        tabela.getTableHeader().setForeground(VERMELHO_ESC);
-        tabela.setGridColor(new Color(0xEE, 0xEE, 0xEE));
-    }
+    private void atualizarTabela() {
 
-    private JButton criarBotaoMenu(String texto) {
-        JButton botao = new JButton(texto);
-        botao.setFont(new Font("Arial", Font.PLAIN, 13));
-        botao.setForeground(Color.WHITE);
-        botao.setBackground(VERMELHO);
-        botao.setMaximumSize(new Dimension(180, 36));
-        botao.setPreferredSize(new Dimension(180, 36));
-        botao.setAlignmentX(Component.CENTER_ALIGNMENT);
-        botao.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent e) { botao.setBackground(VERMELHO_ESC); }
-            public void mouseExited(java.awt.event.MouseEvent e)  { botao.setBackground(VERMELHO); }
-        });
-        return botao;
-    }
+        modelo.setRowCount(0);
 
-    private void atualizarTabelas() {
-        modeloPendentes.setRowCount(0);
-        modeloFinalizadas.setRowCount(0);
+        String nome = (String) comboCamp.getSelectedItem();
 
-        String nomeCampeonato = (String) comboCampeonato.getSelectedItem();
-        if (nomeCampeonato == null) return;
-
-        // corrigido — era buscarNome, agora é ProcurarCampeonato
-        Campeonato campeonato = campeonatoController.ProcurarCampeonato(nomeCampeonato);
-        if (campeonato == null) return;
-
-        // corrigido — usa o controller para filtrar
-        List<Partida> pendentes = campeonatoController.getPartidasPendentes(campeonato);
-        for (Partida p : pendentes) {
-            modeloPendentes.addRow(new Object[]{
-                    p.getClubeCasa().getNome(),       // corrigido — era getClubeMandante
-                    p.getClubeVisitante().getNome(),
-                    p.getDataPartida().toString(),    // corrigido — era getData
-                    p.getHoraPartida().toString()     // corrigido — era getHora
-            });
+        if(nome == null){
+            return;
         }
 
-        List<Partida> finalizadas = campeonatoController.getPartidasFinalizadas(campeonato);
-        for (Partida p : finalizadas) {
-            // corrigido — era getGolMandante/getGolVisitante
-            String placar = p.getGolsCasa() + " x " + p.getGolsVisitante();
+        Campeonato campeonato =
+                campCtrl.ProcurarCampeonato(nome);
 
-            // corrigido — getResultado agora retorna int: 1=casa, 2=visitante, 0=empate
+        if(campeonato == null){
+            return;
+        }
+
+        for(Partida p : campeonato.getPartidas()){
+
+            if(!p.isPartidaFinalizada()){
+                continue;
+            }
+
             String resultado;
-            int r = p.getResultado();
-            if (r == 1) resultado = p.getClubeCasa().getNome() + " venceu";
-            else if (r == 2) resultado = p.getClubeVisitante().getNome() + " venceu";
-            else resultado = "Empate";
 
-            modeloFinalizadas.addRow(new Object[]{
+            if(p.getResultado() == 1){
+                resultado =
+                        p.getClubeCasa().getNome() + " venceu";
+            }
+            else if(p.getResultado() == 2){
+                resultado =
+                        p.getClubeVisitante().getNome() + " venceu";
+            }
+            else{
+                resultado = "Empate";
+            }
+
+            modelo.addRow(new Object[]{
                     p.getClubeCasa().getNome(),
                     p.getClubeVisitante().getNome(),
-                    placar,
+                    p.getGolsCasa() + " x " + p.getGolsVisitante(),
                     resultado
             });
         }
     }
 
-    public void atualizar() {
-        comboCampeonato.removeAllItems();
-        for (Campeonato c : campeonatoController.getCampeonatos()) {
-            comboCampeonato.addItem(c.getNome());
+    public void atualizar(){
+
+        comboCamp.removeAllItems();
+
+        for(Campeonato c : campCtrl.getCampeonatos()){
+            comboCamp.addItem(c.getNome());
         }
-        atualizarTabelas();
+
+        atualizarTabela();
     }
 }

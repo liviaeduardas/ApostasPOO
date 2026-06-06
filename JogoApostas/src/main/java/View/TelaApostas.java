@@ -1,328 +1,159 @@
 package View;
 import Controller.ApostaController;
 import Controller.CampeonatoController;
-import Model.Aposta;
-import Model.Campeonato;
-import Model.Grupo;
-import Model.Partida;
-import Model.Participante;
+import Controller.GrupoController;
+import Model.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class TelaApostas extends JPanel {
-    private MainFrame mainFrame;
+
+    private MainFrame main;
     private ApostaController apostaController;
     private CampeonatoController campeonatoController;
+    private GrupoController grupoController;
 
     private JComboBox<String> comboCampeonato;
     private JComboBox<String> comboPartida;
-    private JTextField campoGolsCasa;
-    private JTextField campoGolsVisitante;
-    private JLabel labelBemVindo;
-    private JLabel labelInfo;
+    private JTextField txtGolsCasa;
+    private JTextField txtGolsVisitante;
 
-    private static final Color VERMELHO     = new Color(0x95, 0x0E, 0x17);
-    private static final Color VERMELHO_ESC = new Color(0x70, 0x0A, 0x11);
-    private static final Color FUNDO        = new Color(0xFF, 0xF5, 0xF5);
+    public TelaApostas(MainFrame main,
+                       ApostaController apostaController,
+                       CampeonatoController campeonatoController,
+                       GrupoController grupoController) {
 
-    public TelaApostas(MainFrame mainFrame, ApostaController apostaController, CampeonatoController campeonatoController) {
-        this.mainFrame            = mainFrame;
-        this.apostaController     = apostaController;
+        this.main = main;
+        this.apostaController = apostaController;
         this.campeonatoController = campeonatoController;
-        inicializarComponentes();
-    }
+        this.grupoController = grupoController;
 
-    private void inicializarComponentes() {
-        setLayout(new BorderLayout());
-        setBackground(FUNDO);
+        setLayout(new GridLayout(7,2));
 
-        JPanel lateral = new JPanel();
-        lateral.setLayout(new BoxLayout(lateral, BoxLayout.Y_AXIS));
-        lateral.setBackground(VERMELHO);
-        lateral.setPreferredSize(new Dimension(180, 0));
-        lateral.setBorder(new EmptyBorder(30, 0, 20, 0));
-
-        JLabel sistema = new JLabel("Sistema", SwingConstants.CENTER);
-        sistema.setFont(new Font("Arial", Font.BOLD, 18));
-        sistema.setForeground(Color.WHITE);
-        sistema.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lateral.add(sistema);
-
-        labelBemVindo = new JLabel("Participante", SwingConstants.CENTER);
-        labelBemVindo.setFont(new Font("Arial", Font.PLAIN, 12));
-        labelBemVindo.setForeground(new Color(0xFF, 0xCC, 0xCC));
-        labelBemVindo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lateral.add(labelBemVindo);
-
-        lateral.add(Box.createVerticalStrut(30));
-
-        JSeparator sep = new JSeparator();
-        sep.setMaximumSize(new Dimension(140, 1));
-        sep.setForeground(new Color(0xAA, 0x33, 0x33));
-        sep.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lateral.add(sep);
-        lateral.add(Box.createVerticalStrut(20));
-
-        JButton btnApostas = criarBotaoMenu("Minhas Apostas");
-        btnApostas.addActionListener(e -> verMinhasApostas());
-        lateral.add(btnApostas);
-        lateral.add(Box.createVerticalStrut(4));
-
-        JButton btnGrupos = criarBotaoMenu("Grupos");
-        btnGrupos.addActionListener(e -> abrirDialogGrupos());
-        lateral.add(btnGrupos);
-        lateral.add(Box.createVerticalStrut(4));
-
-        JButton btnClassificacao = criarBotaoMenu("Classificação");
-        btnClassificacao.addActionListener(e -> mainFrame.trocarTela("telaClassificacao"));
-        lateral.add(btnClassificacao);
-        lateral.add(Box.createVerticalStrut(4));
-
-        JButton btnResultados = criarBotaoMenu("Resultados");
-        btnResultados.addActionListener(e -> mainFrame.trocarTela("telaResultados"));
-        lateral.add(btnResultados);
-        lateral.add(Box.createVerticalGlue());
-
-        JButton botaoSair = criarBotaoMenu("Sair");
-        botaoSair.setForeground(new Color(0xFF, 0xCC, 0xCC));
-        botaoSair.addActionListener(e -> mainFrame.trocarTela("telaLogin"));
-        lateral.add(botaoSair);
-        lateral.add(Box.createVerticalStrut(10));
-
-        add(lateral, BorderLayout.WEST);
-
-        JPanel direita = new JPanel(new GridBagLayout());
-        direita.setBackground(FUNDO);
-        direita.setBorder(new EmptyBorder(30, 40, 30, 40));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.WEST;
-
-        JLabel titulo = new JLabel("Registrar Aposta");
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
-        titulo.setForeground(VERMELHO);
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        gbc.insets = new Insets(0, 0, 24, 0);
-        direita.add(titulo, gbc);
-
-        gbc.gridwidth = 1;
-
-        gbc.gridx = 0; gbc.gridy = 1; gbc.insets = new Insets(10, 0, 2, 16); gbc.fill = GridBagConstraints.NONE;
-        direita.add(new JLabel("Campeonato:"), gbc);
+        add(new JLabel("Campeonato"));
         comboCampeonato = new JComboBox<>();
-        comboCampeonato.setPreferredSize(new Dimension(260, 34));
-        comboCampeonato.addActionListener(e -> atualizarPartidas());
-        gbc.gridx = 1; gbc.insets = new Insets(10, 0, 2, 0); gbc.fill = GridBagConstraints.HORIZONTAL;
-        direita.add(comboCampeonato, gbc);
+        add(comboCampeonato);
 
-        gbc.gridx = 0; gbc.gridy = 2; gbc.insets = new Insets(10, 0, 2, 16); gbc.fill = GridBagConstraints.NONE;
-        direita.add(new JLabel("Partida:"), gbc);
+        add(new JLabel("Partida"));
         comboPartida = new JComboBox<>();
-        comboPartida.setPreferredSize(new Dimension(260, 34));
-        gbc.gridx = 1; gbc.insets = new Insets(10, 0, 2, 0); gbc.fill = GridBagConstraints.HORIZONTAL;
-        direita.add(comboPartida, gbc);
+        add(comboPartida);
 
-        gbc.gridx = 0; gbc.gridy = 3; gbc.insets = new Insets(10, 0, 2, 16); gbc.fill = GridBagConstraints.NONE;
-        direita.add(new JLabel("Gols mandante:"), gbc);
-        campoGolsCasa = new JTextField();
-        campoGolsCasa.setPreferredSize(new Dimension(260, 34));
-        gbc.gridx = 1; gbc.insets = new Insets(10, 0, 2, 0); gbc.fill = GridBagConstraints.HORIZONTAL;
-        direita.add(campoGolsCasa, gbc);
+        add(new JLabel("Gols Casa"));
+        txtGolsCasa = new JTextField();
+        add(txtGolsCasa);
 
-        gbc.gridx = 0; gbc.gridy = 4; gbc.insets = new Insets(10, 0, 2, 16); gbc.fill = GridBagConstraints.NONE;
-        direita.add(new JLabel("Gols visitante:"), gbc);
-        campoGolsVisitante = new JTextField();
-        campoGolsVisitante.setPreferredSize(new Dimension(260, 34));
-        gbc.gridx = 1; gbc.insets = new Insets(10, 0, 2, 0); gbc.fill = GridBagConstraints.HORIZONTAL;
-        direita.add(campoGolsVisitante, gbc);
+        add(new JLabel("Gols Visitante"));
+        txtGolsVisitante = new JTextField();
+        add(txtGolsVisitante);
 
-        labelInfo = new JLabel(" ");
-        labelInfo.setFont(new Font("Arial", Font.ITALIC, 12));
-        labelInfo.setForeground(new Color(0x99, 0x00, 0x00));
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
-        gbc.insets = new Insets(8, 0, 8, 0);
-        direita.add(labelInfo, gbc);
+        JButton apostar = new JButton("Apostar");
+        add(apostar);
 
-        JButton botaoApostar = criarBotaoAcao("Registrar Aposta");
-        botaoApostar.addActionListener(e -> FazerAposta());
-        gbc.gridy = 6; gbc.insets = new Insets(10, 0, 0, 0); gbc.fill = GridBagConstraints.NONE;
-        direita.add(botaoApostar, gbc);
+        JButton sair = new JButton("Sair");
+        add(sair);
 
-        add(direita, BorderLayout.CENTER);
+        apostar.addActionListener(e -> fazerAposta());
+
+        sair.addActionListener(e ->
+                main.trocarTela("telaLogin"));
+
+        comboCampeonato.addActionListener(e ->
+                carregarPartidas());
     }
 
-    private JButton criarBotaoMenu(String texto) {
-        JButton botao = new JButton(texto);
-        botao.setFont(new Font("Arial", Font.PLAIN, 13));
-        botao.setForeground(Color.WHITE);
-        botao.setBackground(VERMELHO);
-        botao.setMaximumSize(new Dimension(180, 36));
-        botao.setPreferredSize(new Dimension(180, 36));
-        botao.setAlignmentX(Component.CENTER_ALIGNMENT);
-        botao.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent e) { botao.setBackground(VERMELHO_ESC); }
-            public void mouseExited(java.awt.event.MouseEvent e)  { botao.setBackground(VERMELHO); }
-        });
-        return botao;
-    }
-
-    private JButton criarBotaoAcao(String texto) {
-        JButton botao = new JButton(texto);
-        botao.setFont(new Font("Arial", Font.BOLD, 13));
-        botao.setBackground(VERMELHO);
-        botao.setForeground(Color.WHITE);
-        botao.setPreferredSize(new Dimension(200, 36));
-        return botao;
-    }
-
-    private void FazerAposta() {
-        Participante participante = mainFrame.getParticipanteLogado();
-        if (participante == null) return;
-
-        String nomePartida = (String) comboPartida.getSelectedItem();
-        String golsMStr    = campoGolsCasa.getText().trim();
-        String golsVStr    = campoGolsVisitante.getText().trim();
-
-        if (nomePartida == null || golsMStr.isEmpty() || golsVStr.isEmpty()) {
-            labelInfo.setText("Preencha todos os campos!");
-            return;
-        }
+    private void fazerAposta() {
 
         try {
-            int golsC = Integer.parseInt(golsMStr);
-            int golsV = Integer.parseInt(golsVStr);
 
-            Partida partida = buscarPartidaPorString(nomePartida);
-            if (partida == null) return;
+            Participante participante = main.getParticipanteLogado();
 
-            // corrigido — era registrarAposta, agora é FazerAposta
-            boolean apostou = apostaController.FazerAposta(participante, partida, golsC, golsV);
+            Partida partida = getPartidaSelecionada();
 
-            if (apostou) {
-                JOptionPane.showMessageDialog(mainFrame, "Aposta registrada! Palpite: " + golsC + " x " + golsV);
-                campoGolsCasa.setText("");
-                campoGolsVisitante.setText("");
-                labelInfo.setText(" ");
-            } else {
-                labelInfo.setText("Não foi possível registrar a aposta!");
+            int golsCasa =
+                    Integer.parseInt(txtGolsCasa.getText());
+
+            int golsVisitante =
+                    Integer.parseInt(txtGolsVisitante.getText());
+
+            boolean ok =
+                    apostaController.registrarAposta(
+                            participante,
+                            partida,
+                            golsCasa,
+                            golsVisitante);
+
+            if(ok){
+                JOptionPane.showMessageDialog(this,
+                        "Aposta realizada!");
+            }else{
+                JOptionPane.showMessageDialog(this,
+                        "Não foi possível apostar.");
             }
-        } catch (NumberFormatException ex) {
-            labelInfo.setText("Digite apenas números nos gols!");
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Digite valores válidos.");
+
         }
     }
 
-    private void verMinhasApostas() {
-        Participante participante = mainFrame.getParticipanteLogado();
-        if (participante == null) return;
+    private void carregarPartidas() {
 
-        List<Aposta> apostas = apostaController.getApostasPorParticipante(participante);
-
-        if (apostas.isEmpty()) {
-            JOptionPane.showMessageDialog(mainFrame, "Você ainda não fez nenhuma aposta!");
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (Aposta a : apostas) {
-            sb.append("Partida: ").append(a.getPartida().toString()).append("\n");
-            // corrigido — nomes dos métodos atualizados
-            sb.append("Palpite: ").append(a.getPalpiteGolsCasa()).append(" x ").append(a.getPalpiteGolsVsitante()).append("\n");
-            sb.append("Pontos: ").append(a.getPontosObtidos()).append("\n");
-            sb.append("---------------------\n");
-        }
-
-        JTextArea area = new JTextArea(sb.toString());
-        area.setEditable(false);
-        area.setFont(new Font("Arial", Font.PLAIN, 13));
-        JScrollPane scroll = new JScrollPane(area);
-        scroll.setPreferredSize(new Dimension(380, 260));
-        JOptionPane.showMessageDialog(mainFrame, scroll, "Minhas Apostas", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void abrirDialogGrupos() {
-        String[] opcoes = {"Criar novo grupo", "Entrar em grupo existente"};
-        int escolha = JOptionPane.showOptionDialog(mainFrame,
-                "O que deseja fazer?", "Grupos",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, opcoes, opcoes[0]);
-
-        if (escolha == 0) criarGrupo();
-        else if (escolha == 1) entrarEmGrupo();
-    }
-
-    private void criarGrupo() {
-        // Grupos só podem ser criados pelo admin — participante não pode criar
-        JOptionPane.showMessageDialog(mainFrame,
-                "Apenas o administrador pode criar grupos!",
-                "Aviso", JOptionPane.WARNING_MESSAGE);
-    }
-
-    private void entrarEmGrupo() {
-        Participante participante = mainFrame.getParticipanteLogado();
-        if (participante == null) return;
-
-        ArrayList<Grupo> grupos = mainFrame.getGrupoController().getGrupos();
-        if (grupos.isEmpty()) {
-            JOptionPane.showMessageDialog(mainFrame, "Nenhum grupo disponível!");
-            return;
-        }
-
-        String[] nomes = grupos.stream().map(Grupo::getNome).toArray(String[]::new);
-
-        String escolhido = (String) JOptionPane.showInputDialog(mainFrame,
-                "Escolha o grupo:", "Entrar em Grupo",
-                JOptionPane.PLAIN_MESSAGE, null, nomes, nomes[0]);
-
-        if (escolhido == null) return;
-
-        // corrigido — era buscarNome, agora é BuscarNome
-        Grupo grupo = mainFrame.getGrupoController().BuscarNome(escolhido);
-        // corrigido — era adicionarParticipante, agora é addParticipante
-        boolean entrou = mainFrame.getGrupoController().addParticipante(grupo, participante);
-
-        if (entrou) {
-            JOptionPane.showMessageDialog(mainFrame, "Você entrou no grupo!");
-        } else {
-            JOptionPane.showMessageDialog(mainFrame, "Não foi possível entrar no grupo!", "Erro", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void atualizarPartidas() {
         comboPartida.removeAllItems();
-        String nomeCampeonato = (String) comboCampeonato.getSelectedItem();
-        if (nomeCampeonato == null) return;
-        // corrigido — era BuscarNome, agora é ProcurarCampeonato
-        Campeonato campeonato = campeonatoController.ProcurarCampeonato(nomeCampeonato);
-        if (campeonato == null) return;
-        // corrigido — usa o controller para filtrar pendentes
-        for (Partida p : campeonatoController.getPartidasPendentes(campeonato)) {
-            comboPartida.addItem(p.toString());
+
+        String nome =
+                (String) comboCampeonato.getSelectedItem();
+
+        Campeonato campeonato =
+                campeonatoController.buscarNome(nome);
+
+        if(campeonato == null){
+            return;
+        }
+
+        for(Partida partida : campeonato.getPartidas()){
+            if(!partida.isPartidaFinalizada()){
+                comboPartida.addItem(partida.toString());
+            }
         }
     }
 
-    private Partida buscarPartidaPorString(String texto) {
-        for (Campeonato c : campeonatoController.getCampeonatos()) {
-            for (Partida p : c.getPartidas()) {
-                if (p.toString().equals(texto)) return p;
+    private Partida getPartidaSelecionada() {
+
+        String texto =
+                (String) comboPartida.getSelectedItem();
+
+        if(texto == null){
+            return null;
+        }
+
+        for(Campeonato c :
+                campeonatoController.getCampeonatos()) {
+
+            for(Partida p : c.getPartidas()) {
+
+                if(p.toString().equals(texto)){
+                    return p;
+                }
             }
         }
+
         return null;
     }
 
     public void atualizar() {
-        Participante participante = mainFrame.getParticipanteLogado();
-        if (participante != null) labelBemVindo.setText(participante.getNome());
+
         comboCampeonato.removeAllItems();
-        for (Campeonato c : campeonatoController.getCampeonatos()) {
-            comboCampeonato.addItem(c.getNome());
+
+        for(Campeonato campeonato :
+                campeonatoController.getCampeonatos()) {
+
+            comboCampeonato.addItem(
+                    campeonato.getNome());
         }
-        atualizarPartidas();
-        labelInfo.setText(" ");
-        campoGolsCasa.setText("");
-        campoGolsVisitante.setText("");
+
+        carregarPartidas();
     }
 }
