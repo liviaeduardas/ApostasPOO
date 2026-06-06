@@ -33,17 +33,18 @@ public class MainFrame extends JFrame {
 
         cardLayout = new CardLayout();
         painelPrincipal = new JPanel(cardLayout);
+
         telaLogin = new TelaLogin(this, usuarioController);
         telaClassificacao = new TelaClassificacao(this, grupoController);
         telaCadastro = new TelaCadastro(this, campeonatoController, partidaController);
         telaApostas = new TelaApostas(this, apostaController, campeonatoController);
         telaResultados = new TelaResultados(this, partidaController, campeonatoController, apostaController);
 
-        painelPrincipal.add(telaResultados, "telaResultados");
-        painelPrincipal.add(telaApostas, "telaApostas");
-        painelPrincipal.add(telaCadastro, "telaCadastro");
-        painelPrincipal.add(telaLogin, "telaLogin");
-        painelPrincipal.add(telaClassificacao, "telaClassificacao");
+        painelPrincipal.add(telaResultados,"telaResultados");
+        painelPrincipal.add(telaApostas,"telaApostas");
+        painelPrincipal.add(telaCadastro,"telaCadastro");
+        painelPrincipal.add(telaLogin,"telaLogin");
+        painelPrincipal.add(telaClassificacao,"telaClassificacao");
 
         setTitle("Sistema de Apostas");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,51 +58,20 @@ public class MainFrame extends JFrame {
 
     public void trocarTela(String nomeTela) {
         cardLayout.show(painelPrincipal, nomeTela);
-
-        if (nomeTela.equals("telaClassificacao")) {
-            telaClassificacao.atualizar();
-        }
-        if (nomeTela.equals("telaApostas")) {
-            telaApostas.atualizar();
-        }
-        if (nomeTela.equals("telaResultados")) {
-            telaResultados.atualizar();
-        }
+        if (nomeTela.equals("telaClassificacao")) telaClassificacao.atualizar();
+        if (nomeTela.equals("telaApostas"))telaApostas.atualizar();
+        if (nomeTela.equals("telaResultados"))telaResultados.atualizar();
     }
 
-    public void setParticipanteLogado(Participante participante){
-        this.participanteLogado = participante;
-    }
+    public void setParticipanteLogado(Participante participante) { this.participanteLogado = participante; }
+    public Participante getParticipanteLogado(){ return participanteLogado; }
 
-    public Participante getParticipanteLogado(){
-        return participanteLogado;
-    }
+    public void setAdminLogado(Administrador admin){ this.adminLogado = admin; }
+    public Administrador getAdminLogado(){ return adminLogado; }
 
-    public void setAdminLogado(Administrador admin){
-        this.adminLogado = admin;
-    }
-
-    public Administrador getAdminLogado(){
-        return adminLogado;
-    }
-
-    public UsuarioController getUsuarioController(){
-        return usuarioController;
-    }
-
-    public GrupoController getGrupoController(){
-        return grupoController;
-    }
-
-    public CampeonatoController getCampeonatoController(){
-        return campeonatoController;
-    }
-
-    public PartidaController getPartidaController(){
-        return partidaController;
-    }
-
-    public ApostaController getApostaController(){
-        return apostaController;
-    }
+    public UsuarioController getUsuarioController(){ return usuarioController; }
+    public GrupoController getGrupoController(){ return grupoController; }
+    public CampeonatoController getCampeonatoController(){ return campeonatoController; }
+    public PartidaController getPartidaController(){ return partidaController; }
+    public ApostaController getApostaController(){ return apostaController; }
 }

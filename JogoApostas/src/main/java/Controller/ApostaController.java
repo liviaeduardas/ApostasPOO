@@ -1,5 +1,6 @@
 package Controller;
 import Model.Aposta;
+import Model.Campeonato;
 import Model.Participante;
 import Model.Partida;
 import java.util.ArrayList;
@@ -12,37 +13,29 @@ public class ApostaController {
     }
 
     public boolean FazerAposta(Participante participante, Partida partida, int GolsCasa, int GolsVisitante) {
-        if (participante == null || partida == null) {
-            return false;
-        }
+        if (participante == null || partida == null) return false;
+        if (GolsCasa < 0 || GolsVisitante < 0) return false;
+        if (partida.isPartidaFinalizada()) return false;
 
-        if (GolsCasa < 0 || GolsVisitante < 0) {
-            return false;
-        }
+        // Cria a aposta corretamente — id 0 pois o banco vai gerar automaticamente
+        Aposta aposta = new Aposta(0, participante, partida, GolsCasa, GolsVisitante);
 
-        if (partida.isPartidaFinalizada()) {
-            return false;
-        }
+        if (!aposta.PossivelApostar()) return false;
 
-        Aposta aposta = new Aposta(int idAposta, Participante, Partida, int, int);
-
-        if (!aposta.PossivelApostar()) {
-            return false;
-        }
-
+        // Verifica duplicata — mesmo participante na mesma partida
         for (Aposta a : apostas) {
-            if (a.getParticipante() == participante && a.getPartida() == partida) {
-                return false;
-            }
+            if (a.getParticipante() == participante && a.getPartida() == partida) return false;
         }
+
         apostas.add(aposta);
         participante.FazerAposta(aposta);
         return true;
     }
 
-    public void CalcularPontos() {
+    public void CalcularPontos(Campeonato campeonato) {
         for (Aposta aposta : apostas) {
-            if (aposta.getPartida().isPartidaFinalizada()) {
+            if (campeonato.getPartidas().contains(aposta.getPartida())
+                    && aposta.getPartida().isPartidaFinalizada()) {
                 aposta.CalcularResultadoAposta();
             }
         }
@@ -51,9 +44,7 @@ public class ApostaController {
     public ArrayList<Aposta> getApostasPorParticipante(Participante participante) {
         ArrayList<Aposta> resultado = new ArrayList<>();
         for (Aposta aposta : apostas) {
-            if (aposta.getParticipante() == participante) {
-                resultado.add(aposta);
-            }
+            if (aposta.getParticipante() == participante) resultado.add(aposta);
         }
         return resultado;
     }
@@ -61,9 +52,7 @@ public class ApostaController {
     public ArrayList<Aposta> getApostasPorPartida(Partida partida) {
         ArrayList<Aposta> resultado = new ArrayList<>();
         for (Aposta aposta : apostas) {
-            if (aposta.getPartida() == partida) {
-                resultado.add(aposta);
-            }
+            if (aposta.getPartida() == partida) resultado.add(aposta);
         }
         return resultado;
     }
