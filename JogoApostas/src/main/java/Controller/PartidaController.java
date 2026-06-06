@@ -17,14 +17,14 @@ public class PartidaController {
         if (ClubeCasa.equals(ClubeVisitante)) return false;
 
         PartidaRegular nova = new PartidaRegular(ClubeCasa, ClubeVisitante, DataPartida, HoraPartida);
-        return campeonato.AddPartida(nova);
+        return campeonato.addPartida(nova);
     }
 
     public boolean AddResultado(Partida partida, int GolsCasa, int GolsVisitante) {
         if (partida == null) return false;
         if (partida.isPartidaFinalizada()) return false;
         if (GolsCasa < 0 || GolsVisitante < 0) return false;
-        partida.ResultadoFinal(GolsCasa, GolsVisitante);
+        partida.resultadoFinal(GolsCasa, GolsVisitante);
         return true;
     }
 

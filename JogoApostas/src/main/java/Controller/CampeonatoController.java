@@ -32,13 +32,13 @@ public class CampeonatoController {
     // Delega a validação (limite, duplicata) para o próprio Campeonato
     public boolean AddClube(Campeonato campeonato, Clube clube) {
         if (campeonato == null || clube == null) return false;
-        return campeonato.AddCLube(clube);
+        return campeonato.addCLube(clube);
     }
 
     // Delega a validação (clube pertence ao campeonato) para o próprio Campeonato
     public boolean AddPartida(Campeonato campeonato, Partida partida) {
         if (campeonato == null || partida == null) return false;
-        return campeonato.AddPartida(partida);
+        return campeonato.addPartida(partida);
     }
 
     // Retorna lista de partidas ainda não finalizadas

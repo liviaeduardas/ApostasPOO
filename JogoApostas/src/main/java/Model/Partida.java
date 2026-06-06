@@ -115,7 +115,7 @@ public class Partida {
         this.PartidaFinalizada = PartidaFinalizada;
     }
 
-    public void ResultadoFinal(int GolsCasa, int GolsVisitante){
+    public void resultadoFinal(int GolsCasa, int GolsVisitante){
         this.GolsVisitante = GolsVisitante;
         this.GolsCasa = GolsCasa;
         this.PartidaFinalizada = true;

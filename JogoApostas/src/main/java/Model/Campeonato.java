@@ -47,7 +47,7 @@ public class Campeonato {
         this.partidas = new ArrayList<>();
     }
 
-    public boolean AddCLube(Clube clube) {
+    public boolean addCLube(Clube clube) {
         if (clubes.size() >= MAX_CLUBES) {
             System.out.println("Limite máximo de 8 clubes atingido");
             return false;
@@ -63,7 +63,7 @@ public class Campeonato {
         return true;
     }
 
-    public boolean AddPartida(Partida partida) {
+    public boolean addPartida(Partida partida) {
         boolean CasaExiste = false;
         boolean VisitanteExiste = false;
 
@@ -85,7 +85,7 @@ public class Campeonato {
         return true;
     }
 
-    public boolean PartidasNaoFinalizadas() {
+    public boolean partidasNaoFinalizadas() {
         for (Partida partida : partidas) {
             if (!partida.isPartidaFinalizada()) {
                 return true;
@@ -94,13 +94,14 @@ public class Campeonato {
         return false;
     }
 
-    public boolean PartidasFinalizadas() {
+    public boolean partidasFinalizadas() {
         for (Partida partida : partidas) {
             if (partida.isPartidaFinalizada()) {
                 return true;
             }
         }
         return false;
+
     }
 
     public String getNome(){
