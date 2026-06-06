@@ -3,6 +3,7 @@ import Model.Campeonato;
 import Model.Clube;
 import Model.Partida;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CampeonatoController {
     private ArrayList<Campeonato> campeonatos;
@@ -14,63 +15,68 @@ public class CampeonatoController {
     }
 
     public boolean NovoCampeonato(String nome, int ano) {
-        if (nome == null || nome.trim().isEmpty()) {
-            return false;
-        }
+        if (nome == null || nome.trim().isEmpty()) return false;
         Campeonato novo = new Campeonato(nome.trim(), ano);
         campeonatos.add(novo);
         return true;
     }
 
     public boolean CadastrarClube(String nome, String sigla) {
-        if (nome == null || nome.trim().isEmpty()) {
-            return false;
-        }
-        if (sigla == null || sigla.trim().isEmpty()) {
-            return false;
-        }
+        if (nome == null || nome.trim().isEmpty()) return false;
+        if (sigla == null || sigla.trim().isEmpty()) return false;
         Clube novo = new Clube(nome.trim(), sigla.trim());
         clubes.add(novo);
         return true;
     }
 
+    // Delega a validação (limite, duplicata) para o próprio Campeonato
     public boolean AddClube(Campeonato campeonato, Clube clube) {
-        if (campeonato == null || clube == null) {
-            return false;
-        }
-        return campeonato.AddClube(clube);
+        if (campeonato == null || clube == null) return false;
+        return campeonato.AddCLube(clube);
     }
 
+    // Delega a validação (clube pertence ao campeonato) para o próprio Campeonato
     public boolean AddPartida(Campeonato campeonato, Partida partida) {
-        if (campeonato == null || partida == null) {
-            return false;
-        }
+        if (campeonato == null || partida == null) return false;
         return campeonato.AddPartida(partida);
     }
 
+    // Retorna lista de partidas ainda não finalizadas
+    public List<Partida> getPartidasPendentes(Campeonato campeonato) {
+        if (campeonato == null) return new ArrayList<>();
+        List<Partida> pendentes = new ArrayList<>();
+        for (Partida p : campeonato.getPartidas()) {
+            if (!p.isPartidaFinalizada()) pendentes.add(p);
+        }
+        return pendentes;
+    }
+
+    // Retorna lista de partidas já finalizadas
+    public List<Partida> getPartidasFinalizadas(Campeonato campeonato) {
+        if (campeonato == null) return new ArrayList<>();
+        List<Partida> finalizadas = new ArrayList<>();
+        for (Partida p : campeonato.getPartidas()) {
+            if (p.isPartidaFinalizada()) finalizadas.add(p);
+        }
+        return finalizadas;
+    }
+
     public Campeonato ProcurarCampeonato(String nome) {
+        if (nome == null) return null;
         for (Campeonato c : campeonatos) {
-            if (c.getNome().equalsIgnoreCase(nome.trim())) {
-                return c;
-            }
+            if (c.getNome().equalsIgnoreCase(nome.trim())) return c;
         }
         return null;
     }
 
     public Clube ProcurarClube(String sigla) {
+        if (sigla == null) return null;
         for (Clube c : clubes) {
-            if (c.getSigla().equalsIgnoreCase(sigla.trim())) {
-                return c;
-            }
+            if (c.getSigla().equalsIgnoreCase(sigla.trim())) return c;
         }
         return null;
     }
 
-    public ArrayList<Campeonato> getCampeonatos(){
-        return campeonatos;
-    }
-
-    public ArrayList<Clube> getClubes(){
-        return clubes;
-    }
+    public ArrayList<Campeonato> getCampeonatos() { return campeonatos; }
+    public ArrayList<Clube> getClubes(){ return clubes; }
 }

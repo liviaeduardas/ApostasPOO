@@ -1,10 +1,11 @@
 package View;
 import Controller.ApostaController;
 import Controller.CampeonatoController;
+import Model.Aposta;
 import Model.Campeonato;
+import Model.Grupo;
 import Model.Partida;
 import Model.Participante;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -23,13 +24,13 @@ public class TelaApostas extends JPanel {
     private JLabel labelBemVindo;
     private JLabel labelInfo;
 
-    private static final Color VERMELHO = new Color(0x95, 0x0E, 0x17);
+    private static final Color VERMELHO     = new Color(0x95, 0x0E, 0x17);
     private static final Color VERMELHO_ESC = new Color(0x70, 0x0A, 0x11);
-    private static final Color FUNDO = new Color(0xFF, 0xF5, 0xF5);
+    private static final Color FUNDO        = new Color(0xFF, 0xF5, 0xF5);
 
     public TelaApostas(MainFrame mainFrame, ApostaController apostaController, CampeonatoController campeonatoController) {
-        this.mainFrame = mainFrame;
-        this.apostaController = apostaController;
+        this.mainFrame            = mainFrame;
+        this.apostaController     = apostaController;
         this.campeonatoController = campeonatoController;
         inicializarComponentes();
     }
@@ -63,7 +64,6 @@ public class TelaApostas extends JPanel {
         sep.setForeground(new Color(0xAA, 0x33, 0x33));
         sep.setAlignmentX(Component.CENTER_ALIGNMENT);
         lateral.add(sep);
-
         lateral.add(Box.createVerticalStrut(20));
 
         JButton btnApostas = criarBotaoMenu("Minhas Apostas");
@@ -84,7 +84,6 @@ public class TelaApostas extends JPanel {
         JButton btnResultados = criarBotaoMenu("Resultados");
         btnResultados.addActionListener(e -> mainFrame.trocarTela("telaResultados"));
         lateral.add(btnResultados);
-
         lateral.add(Box.createVerticalGlue());
 
         JButton botaoSair = criarBotaoMenu("Sair");
@@ -106,8 +105,7 @@ public class TelaApostas extends JPanel {
         JLabel titulo = new JLabel("Registrar Aposta");
         titulo.setFont(new Font("Arial", Font.BOLD, 20));
         titulo.setForeground(VERMELHO);
-        gbc.gridx = 0; gbc.gridy = 0;
-        gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         gbc.insets = new Insets(0, 0, 24, 0);
         direita.add(titulo, gbc);
 
@@ -145,16 +143,13 @@ public class TelaApostas extends JPanel {
         labelInfo = new JLabel(" ");
         labelInfo.setFont(new Font("Arial", Font.ITALIC, 12));
         labelInfo.setForeground(new Color(0x99, 0x00, 0x00));
-        gbc.gridx = 0; gbc.gridy = 5;
-        gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
         gbc.insets = new Insets(8, 0, 8, 0);
         direita.add(labelInfo, gbc);
 
         JButton botaoApostar = criarBotaoAcao("Registrar Aposta");
         botaoApostar.addActionListener(e -> FazerAposta());
-        gbc.gridy = 6;
-        gbc.insets = new Insets(10, 0, 0, 0);
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridy = 6; gbc.insets = new Insets(10, 0, 0, 0); gbc.fill = GridBagConstraints.NONE;
         direita.add(botaoApostar, gbc);
 
         add(direita, BorderLayout.CENTER);
@@ -189,8 +184,8 @@ public class TelaApostas extends JPanel {
         if (participante == null) return;
 
         String nomePartida = (String) comboPartida.getSelectedItem();
-        String golsMStr = campoGolsCasa.getText().trim();
-        String golsVStr = campoGolsVisitante.getText().trim();
+        String golsMStr    = campoGolsCasa.getText().trim();
+        String golsVStr    = campoGolsVisitante.getText().trim();
 
         if (nomePartida == null || golsMStr.isEmpty() || golsVStr.isEmpty()) {
             labelInfo.setText("Preencha todos os campos!");
@@ -204,7 +199,8 @@ public class TelaApostas extends JPanel {
             Partida partida = buscarPartidaPorString(nomePartida);
             if (partida == null) return;
 
-            boolean apostou = apostaController.registrarAposta(participante, partida, golsC, golsV);
+            // corrigido — era registrarAposta, agora é FazerAposta
+            boolean apostou = apostaController.FazerAposta(participante, partida, golsC, golsV);
 
             if (apostou) {
                 JOptionPane.showMessageDialog(mainFrame, "Aposta registrada! Palpite: " + golsC + " x " + golsV);
@@ -214,7 +210,6 @@ public class TelaApostas extends JPanel {
             } else {
                 labelInfo.setText("Não foi possível registrar a aposta!");
             }
-
         } catch (NumberFormatException ex) {
             labelInfo.setText("Digite apenas números nos gols!");
         }
@@ -224,7 +219,7 @@ public class TelaApostas extends JPanel {
         Participante participante = mainFrame.getParticipanteLogado();
         if (participante == null) return;
 
-        List<Model.Aposta> apostas = apostaController.getApostasPorParticipante(participante);
+        List<Aposta> apostas = apostaController.getApostasPorParticipante(participante);
 
         if (apostas.isEmpty()) {
             JOptionPane.showMessageDialog(mainFrame, "Você ainda não fez nenhuma aposta!");
@@ -232,10 +227,11 @@ public class TelaApostas extends JPanel {
         }
 
         StringBuilder sb = new StringBuilder();
-        for (Model.Aposta a : apostas) {
+        for (Aposta a : apostas) {
             sb.append("Partida: ").append(a.getPartida().toString()).append("\n");
-            sb.append("Palpite: ").append(a.getPalpiteGolsCasa()).append(" x ").append(a.getGPalpiteGolsVisitante()).append("\n");
-            sb.append("Pontos: ").append(a.getPontuacaoObtida()).append("\n");
+            // corrigido — nomes dos métodos atualizados
+            sb.append("Palpite: ").append(a.getPalpiteGolsCasa()).append(" x ").append(a.getPalpiteGolsVsitante()).append("\n");
+            sb.append("Pontos: ").append(a.getPontosObtidos()).append("\n");
             sb.append("---------------------\n");
         }
 
@@ -259,36 +255,23 @@ public class TelaApostas extends JPanel {
     }
 
     private void criarGrupo() {
-        Participante participante = mainFrame.getParticipanteLogado();
-        if (participante == null) return;
-
-        String nome = JOptionPane.showInputDialog(mainFrame, "Nome do novo grupo:");
-        if (nome == null || nome.trim().isEmpty()) return;
-
-        boolean criou = mainFrame.getGrupoController().criarGrupoPorParticipante(nome.trim(), participante);
-        if (criou) {
-            Model.Grupo grupo = mainFrame.getGrupoController().buscarNome(nome.trim());
-            mainFrame.getGrupoController().adicionarParticipante(grupo, participante);
-            JOptionPane.showMessageDialog(mainFrame, "Grupo criado com sucesso!");
-        } else {
-            JOptionPane.showMessageDialog(mainFrame, "Limite de 5 grupos atingido!", "Erro", JOptionPane.ERROR_MESSAGE);
-        }
+        // Grupos só podem ser criados pelo admin — participante não pode criar
+        JOptionPane.showMessageDialog(mainFrame,
+                "Apenas o administrador pode criar grupos!",
+                "Aviso", JOptionPane.WARNING_MESSAGE);
     }
 
     private void entrarEmGrupo() {
         Participante participante = mainFrame.getParticipanteLogado();
         if (participante == null) return;
 
-        ArrayList<Model.Grupo> grupos = mainFrame.getGrupoController().getGrupos();
+        ArrayList<Grupo> grupos = mainFrame.getGrupoController().getGrupos();
         if (grupos.isEmpty()) {
             JOptionPane.showMessageDialog(mainFrame, "Nenhum grupo disponível!");
             return;
         }
 
-        String[] nomes = new String[grupos.size()];
-        for (int i = 0; i < grupos.size(); i++) {
-            nomes[i] = grupos.get(i).getNome();
-        }
+        String[] nomes = grupos.stream().map(Grupo::getNome).toArray(String[]::new);
 
         String escolhido = (String) JOptionPane.showInputDialog(mainFrame,
                 "Escolha o grupo:", "Entrar em Grupo",
@@ -296,8 +279,10 @@ public class TelaApostas extends JPanel {
 
         if (escolhido == null) return;
 
-        Model.Grupo grupo = mainFrame.getGrupoController().BuscarNome(escolhido);
-        boolean entrou = mainFrame.getGrupoController().AddParticipante(grupo, participante);
+        // corrigido — era buscarNome, agora é BuscarNome
+        Grupo grupo = mainFrame.getGrupoController().BuscarNome(escolhido);
+        // corrigido — era adicionarParticipante, agora é addParticipante
+        boolean entrou = mainFrame.getGrupoController().addParticipante(grupo, participante);
 
         if (entrou) {
             JOptionPane.showMessageDialog(mainFrame, "Você entrou no grupo!");
@@ -310,9 +295,11 @@ public class TelaApostas extends JPanel {
         comboPartida.removeAllItems();
         String nomeCampeonato = (String) comboCampeonato.getSelectedItem();
         if (nomeCampeonato == null) return;
-        Campeonato campeonato = campeonatoController.BuscarNome(nomeCampeonato);
+        // corrigido — era BuscarNome, agora é ProcurarCampeonato
+        Campeonato campeonato = campeonatoController.ProcurarCampeonato(nomeCampeonato);
         if (campeonato == null) return;
-        for (Partida p : campeonato.getPartidasPendentes()) {
+        // corrigido — usa o controller para filtrar pendentes
+        for (Partida p : campeonatoController.getPartidasPendentes(campeonato)) {
             comboPartida.addItem(p.toString());
         }
     }
@@ -328,16 +315,13 @@ public class TelaApostas extends JPanel {
 
     public void atualizar() {
         Participante participante = mainFrame.getParticipanteLogado();
-        if (participante != null) {
-            labelBemVindo.setText(participante.getNome());
-        }
+        if (participante != null) labelBemVindo.setText(participante.getNome());
         comboCampeonato.removeAllItems();
         for (Campeonato c : campeonatoController.getCampeonatos()) {
             comboCampeonato.addItem(c.getNome());
         }
         atualizarPartidas();
         labelInfo.setText(" ");
-
         campoGolsCasa.setText("");
         campoGolsVisitante.setText("");
     }

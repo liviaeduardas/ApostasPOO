@@ -14,6 +14,7 @@ public class UsuarioController {
     }
 
     public Usuario autenticar(String usuario, String senha) {
+        if (usuario == null || senha == null) return null;
 
         if (usuario.equals("admin") && senha.equals("admin")) {
             administrador.autenticar();
@@ -29,38 +30,29 @@ public class UsuarioController {
     }
 
     public boolean cadastrar(Participante participante, String nome) {
-        if (participante == null) {
-            return false;
-        }
-
-        participante.setNome(nome);
+        if (participante == null) return false;
+        if (nome == null || nome.trim().isEmpty()) return false;
+        participante.setNome(nome.trim());
         participantes.add(participante);
         return true;
     }
 
     public boolean temCadastro(String nome) {
+        if (nome == null) return false;
         for (Participante participante : participantes) {
-            if (participante.getNome().equalsIgnoreCase(nome)) {
-                return true;
-            }
+            if (participante.getNome().equalsIgnoreCase(nome.trim())) return true;
         }
         return false;
     }
 
     public Participante buscarNome(String nome) {
+        if (nome == null) return null;
         for (Participante participante : participantes) {
-            if (participante.getNome().equalsIgnoreCase(nome)) {
-                return participante;
-            }
+            if (participante.getNome().equalsIgnoreCase(nome.trim())) return participante;
         }
         return null;
     }
 
-    public Administrador getAdministrador(){
-        return administrador;
-    }
-
-    public ArrayList<Participante> getParticipantes(){
-        return participantes;
-    }
+    public Administrador getAdministrador(){ return administrador; }
+    public ArrayList<Participante> getParticipantes() { return participantes; }
 }

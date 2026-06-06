@@ -2,14 +2,12 @@ package View;
 import Controller.GrupoController;
 import Model.Grupo;
 import Model.Participante;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
 public class TelaClassificacao extends JPanel {
-
     private MainFrame mainFrame;
     private GrupoController grupoController;
 
@@ -18,12 +16,12 @@ public class TelaClassificacao extends JPanel {
     private javax.swing.table.DefaultTableModel modeloTabela;
     private JLabel labelInfo;
 
-    private static final Color VERMELHO = new Color(0x95, 0x0E, 0x17);
+    private static final Color VERMELHO     = new Color(0x95, 0x0E, 0x17);
     private static final Color VERMELHO_ESC = new Color(0x70, 0x0A, 0x11);
-    private static final Color FUNDO = new Color(0xFF, 0xF5, 0xF5);
+    private static final Color FUNDO        = new Color(0xFF, 0xF5, 0xF5);
 
     public TelaClassificacao(MainFrame mainFrame, GrupoController grupoController) {
-        this.mainFrame = mainFrame;
+        this.mainFrame       = mainFrame;
         this.grupoController = grupoController;
         inicializarComponentes();
     }
@@ -57,14 +55,11 @@ public class TelaClassificacao extends JPanel {
         sep.setForeground(new Color(0xAA, 0x33, 0x33));
         sep.setAlignmentX(Component.CENTER_ALIGNMENT);
         lateral.add(sep);
-
         lateral.add(Box.createVerticalStrut(20));
 
         JButton btnAtualizar = criarBotaoMenu("Atualizar");
         btnAtualizar.addActionListener(e -> atualizar());
         lateral.add(btnAtualizar);
-        lateral.add(Box.createVerticalStrut(4));
-
         lateral.add(Box.createVerticalGlue());
 
         JButton botaoVoltar = criarBotaoMenu("Voltar");
@@ -154,11 +149,10 @@ public class TelaClassificacao extends JPanel {
         String nomeGrupo = (String) comboGrupos.getSelectedItem();
         if (nomeGrupo == null) return;
 
-        Grupo grupo = grupoController.buscarNome(nomeGrupo);
+        Grupo grupo = grupoController.BuscarNome(nomeGrupo);
         if (grupo == null) return;
 
         ArrayList<Participante> ranking = grupoController.getRanking(grupo);
-
         for (int i = 0; i < ranking.size(); i++) {
             Participante p = ranking.get(i);
             modeloTabela.addRow(new Object[]{(i + 1) + "º", p.getNome(), p.getTotalPontos() + " pts"});

@@ -3,13 +3,12 @@ import Controller.UsuarioController;
 import Model.Administrador;
 import Model.Participante;
 import Model.Usuario;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class TelaLogin extends JPanel {
     private MainFrame mainFrame;
-    private LoginController loginController;
+    private UsuarioController usuarioController;
     private JTextField campoUsuario;
     private JPasswordField campoSenha;
     private JButton botaoEntrar;
@@ -18,9 +17,9 @@ public class TelaLogin extends JPanel {
     private static final Color VERMELHO = new Color(0x95, 0x0E, 0x17);
     private static final Color FUNDO = new Color(0xFF, 0xF5, 0xF5);
 
-    public TelaLogin(MainFrame mainFrame, LoginController loginController) {
+    public TelaLogin(MainFrame mainFrame, UsuarioController usuarioController) {
         this.mainFrame = mainFrame;
-        this.loginController = loginController;
+        this.usuarioController = usuarioController;
         inicializarComponentes();
     }
 
@@ -35,7 +34,6 @@ public class TelaLogin extends JPanel {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-
         JLabel titulo = new JLabel("Sistema de Apostas", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 22));
         titulo.setForeground(Color.BLACK);
@@ -45,14 +43,12 @@ public class TelaLogin extends JPanel {
         gbc.gridwidth = 1;
         gbc.gridx = 0; gbc.gridy = 1;
         card.add(new JLabel("Usuário:"), gbc);
-
         campoUsuario = new JTextField(16);
         gbc.gridx = 1;
         card.add(campoUsuario, gbc);
 
         gbc.gridx = 0; gbc.gridy = 2;
         card.add(new JLabel("Senha:"), gbc);
-
         campoSenha = new JPasswordField(16);
         gbc.gridx = 1;
         card.add(campoSenha, gbc);
@@ -80,7 +76,8 @@ public class TelaLogin extends JPanel {
     private void realizarLogin() {
         String login = campoUsuario.getText().trim();
         String senha = new String(campoSenha.getPassword()).trim();
-        Usuario usuario = loginController.autenticar(login, senha);
+
+        Usuario usuario = usuarioController.autenticar(login, senha);
 
         if (usuario == null) {
             labelErro.setText("Usuário ou senha incorretos!");
@@ -92,13 +89,11 @@ public class TelaLogin extends JPanel {
         campoUsuario.setText("");
         campoSenha.setText("");
 
-        if (usuario instanceof Administrador) {
-            mainFrame.setAdminLogado((Administrador) usuario);
+        if (usuario instanceof Administrador admin) {
+            mainFrame.setAdminLogado(admin);
             mainFrame.trocarTela("telaCadastro");
 
-        } else if (usuario instanceof Participante) {
-            Participante participante = (Participante) usuario;
-
+        } else if (usuario instanceof Participante participante) {
             if (participante.getNome() == null || participante.getNome().isEmpty()) {
                 pedirNome(participante);
             } else {
@@ -109,30 +104,24 @@ public class TelaLogin extends JPanel {
     }
 
     private void pedirNome(Participante participante) {
-        String nome = JOptionPane.showInputDialog(
-                mainFrame,
-                "Digite seu nome:",
-                "Cadastro",
-                JOptionPane.PLAIN_MESSAGE
-        );
+        String nome = JOptionPane.showInputDialog(mainFrame, "Digite seu nome:", "Cadastro", JOptionPane.PLAIN_MESSAGE);
 
         if (nome == null || nome.trim().isEmpty()) {
             labelErro.setText("Nome obrigatório para continuar!");
             return;
         }
 
-        Participante existente = loginController.buscarNome(nome);
+        // Se já existe, só loga
+        Participante existente = usuarioController.buscarNome(nome);
         if (existente != null) {
             mainFrame.setParticipanteLogado(existente);
             mainFrame.trocarTela("telaApostas");
             return;
         }
 
-        boolean cadastrou = loginController.cadastrar(participante, nome);
+        boolean cadastrou = usuarioController.cadastrar(participante, nome);
         if (!cadastrou) {
-            JOptionPane.showMessageDialog(mainFrame,
-                    "Erro ao cadastrar participante!",
-                    "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, "Erro ao cadastrar!", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -144,30 +133,22 @@ public class TelaLogin extends JPanel {
 
         if (grupos.isEmpty()) {
             JOptionPane.showMessageDialog(mainFrame,
-                    "Nenhum grupo disponível no momento.\nVocê pode entrar em um grupo depois.",
+                    "Nenhum grupo disponível.\nVocê pode entrar em um grupo depois.",
                     "Aviso", JOptionPane.WARNING_MESSAGE);
             mainFrame.setParticipanteLogado(participante);
             mainFrame.trocarTela("telaApostas");
             return;
         }
 
-        String[] nomesGrupos = grupos.stream()
-                .map(Model.Grupo::getNome)
-                .toArray(String[]::new);
+        String[] nomesGrupos = grupos.stream().map(Model.Grupo::getNome).toArray(String[]::new);
 
-        String grupoEscolhido = (String) JOptionPane.showInputDialog(
-                mainFrame,
-                "Escolha seu grupo:",
-                "Entrar em um grupo",
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                nomesGrupos,
-                nomesGrupos[0]
-        );
+        String grupoEscolhido = (String) JOptionPane.showInputDialog(mainFrame,
+                "Escolha seu grupo:", "Entrar em um grupo",
+                JOptionPane.PLAIN_MESSAGE, null, nomesGrupos, nomesGrupos[0]);
 
         if (grupoEscolhido != null) {
-            Model.Grupo grupo = mainFrame.getGrupoController().buscarNome(grupoEscolhido);
-            boolean entrou = mainFrame.getGrupoController().adicionarParticipante(grupo, participante);
+            Model.Grupo grupo = mainFrame.getGrupoController().BuscarNome(grupoEscolhido);
+            boolean entrou = mainFrame.getGrupoController().addParticipante(grupo, participante);
             if (entrou) {
                 JOptionPane.showMessageDialog(mainFrame, "Você entrou no grupo " + grupoEscolhido + "!");
             } else {
