@@ -31,7 +31,7 @@ public class GrupoController {
         return grupo.getRanking();
     }
 
-    public Grupo BuscarNome(String nome) {
+    public Grupo buscarNome(String nome) {
         if (nome == null) return null;
         for (Grupo grupo : grupos) {
             if (grupo.getNome().equalsIgnoreCase(nome.trim())) return grupo;

@@ -14,14 +14,14 @@ public class CampeonatoController {
         this.clubes = new ArrayList<>();
     }
 
-    public boolean NovoCampeonato(String nome, int ano) {
+    public boolean novoCampeonato(String nome, int ano) {
         if (nome == null || nome.trim().isEmpty()) return false;
         Campeonato novo = new Campeonato(nome.trim(), ano);
         campeonatos.add(novo);
         return true;
     }
 
-    public boolean CadastrarClube(String nome, String sigla) {
+    public boolean cadastrarClube(String nome, String sigla) {
         if (nome == null || nome.trim().isEmpty()) return false;
         if (sigla == null || sigla.trim().isEmpty()) return false;
         Clube novo = new Clube(nome.trim(), sigla.trim());
@@ -30,13 +30,13 @@ public class CampeonatoController {
     }
 
     // Delega a validação (limite, duplicata) para o próprio Campeonato
-    public boolean AddClube(Campeonato campeonato, Clube clube) {
+    public boolean addClube(Campeonato campeonato, Clube clube) {
         if (campeonato == null || clube == null) return false;
         return campeonato.addCLube(clube);
     }
 
     // Delega a validação (clube pertence ao campeonato) para o próprio Campeonato
-    public boolean AddPartida(Campeonato campeonato, Partida partida) {
+    public boolean addPartida(Campeonato campeonato, Partida partida) {
         if (campeonato == null || partida == null) return false;
         return campeonato.addPartida(partida);
     }
@@ -61,7 +61,7 @@ public class CampeonatoController {
         return finalizadas;
     }
 
-    public Campeonato ProcurarCampeonato(String nome) {
+    public Campeonato procurarCampeonato(String nome) {
         if (nome == null) return null;
         for (Campeonato c : campeonatos) {
             if (c.getNome().equalsIgnoreCase(nome.trim())) return c;
@@ -69,7 +69,7 @@ public class CampeonatoController {
         return null;
     }
 
-    public Clube ProcurarClube(String sigla) {
+    public Clube procurarClube(String sigla) {
         if (sigla == null) return null;
         for (Clube c : clubes) {
             if (c.getSigla().equalsIgnoreCase(sigla.trim())) return c;

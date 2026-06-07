@@ -56,7 +56,7 @@ public class TelaCadastro extends JPanel {
 
             try {
 
-                campeonatoController.NovoCampeonato(
+                campeonatoController.novoCampeonato(
                         nome.getText(),
                         Integer.parseInt(ano.getText())
                 );

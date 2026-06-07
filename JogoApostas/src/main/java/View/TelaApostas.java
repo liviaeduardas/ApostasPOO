@@ -77,7 +77,7 @@ public class TelaApostas extends JPanel {
                     Integer.parseInt(txtGolsVisitante.getText());
 
             boolean ok =
-                    apostaController.registrarAposta(
+                    apostaController.fazerAposta(
                             participante,
                             partida,
                             golsCasa,
@@ -107,7 +107,7 @@ public class TelaApostas extends JPanel {
                 (String) comboCampeonato.getSelectedItem();
 
         Campeonato campeonato =
-                campeonatoController.buscarNome(nome);
+                campeonatoController.procurarCampeonato(nome);
 
         if(campeonato == null){
             return;
