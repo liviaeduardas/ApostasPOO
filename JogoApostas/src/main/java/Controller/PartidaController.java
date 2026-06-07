@@ -20,7 +20,7 @@ public class PartidaController {
         return campeonato.addPartida(nova);
     }
 
-    public boolean AddResultado(Partida partida, int GolsCasa, int GolsVisitante) {
+    public boolean addResultado(Partida partida, int GolsCasa, int GolsVisitante) {
         if (partida == null) return false;
         if (partida.isPartidaFinalizada()) return false;
         if (GolsCasa < 0 || GolsVisitante < 0) return false;
@@ -48,7 +48,7 @@ public class PartidaController {
         return finalizadas;
     }
 
-    public Partida ProcurarPartida(Campeonato campeonato, Clube ClubeCasa, Clube ClubeVisitante) {
+    public Partida procurarPartida(Campeonato campeonato, Clube ClubeCasa, Clube ClubeVisitante) {
         if (campeonato == null || ClubeCasa == null || ClubeVisitante == null) return null;
         for (Partida p : campeonato.getPartidas()) {
             if (p.getClubeCasa() == ClubeCasa && p.getClubeVisitante() == ClubeVisitante) return p;

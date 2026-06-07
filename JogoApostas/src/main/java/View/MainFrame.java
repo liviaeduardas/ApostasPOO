@@ -36,7 +36,7 @@ public class MainFrame extends JFrame {
         telaLogin = new TelaLogin(this, usuarioController);
         telaCadastro = new TelaCadastro(this, campeonatoController, partidaController);
         telaApostas = new TelaApostas(this, apostaController, campeonatoController, grupoController);
-        telaResultados = new TelaResultados(this, partidaController, campeonatoController, apostaController);
+        telaResultados = new TelaResultados(this, campeonatoController);
         telaClassificacao = new TelaClassificacao(this, grupoController);
 
         cardLayout = new CardLayout();

@@ -110,7 +110,7 @@ public class TelaLogin extends JPanel {
                         mainFrame.getGrupoController().buscarNome(escolhido);
 
                 mainFrame.getGrupoController()
-                        .adicionarParticipante(grupo, participante);
+                        .addParticipante(grupo, participante);
             }
         }
 

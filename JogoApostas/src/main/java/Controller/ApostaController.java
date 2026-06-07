@@ -12,7 +12,7 @@ public class ApostaController {
         this.apostas = new ArrayList<>();
     }
 
-    public boolean FazerAposta(Participante participante, Partida partida, int GolsCasa, int GolsVisitante) {
+    public boolean fazerAposta(Participante participante, Partida partida, int GolsCasa, int GolsVisitante) {
         if (participante == null || partida == null) return false;
         if (GolsCasa < 0 || GolsVisitante < 0) return false;
         if (partida.isPartidaFinalizada()) return false;
@@ -30,7 +30,7 @@ public class ApostaController {
         return true;
     }
 
-    public void CalcularPontos(Campeonato campeonato) {
+    public void calcularPontos(Campeonato campeonato) {
         for (Aposta aposta : apostas) {
             if (campeonato.getPartidas().contains(aposta.getPartida()) && aposta.getPartida().isPartidaFinalizada()) {
                 aposta.calcularResultadoAposta();

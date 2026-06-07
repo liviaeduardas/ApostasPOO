@@ -69,7 +69,7 @@ public class TelaResultados extends JPanel {
         }
 
         Campeonato campeonato =
-                campCtrl.ProcurarCampeonato(nome);
+                campCtrl.procurarCampeonato(nome);
 
         if(campeonato == null){
             return;
