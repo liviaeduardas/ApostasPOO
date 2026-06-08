@@ -11,11 +11,7 @@ public class PartidaRegular extends Partida {
         super();
     }
 
-    public PartidaRegular(Clube ClubeCasa,
-                          Clube ClubeVisitante,
-                          LocalDate DataPartida,
-                          LocalTime HoraPartida) {
-
+    public PartidaRegular(Clube ClubeCasa, Clube ClubeVisitante, LocalDate DataPartida, LocalTime HoraPartida) {
         super(ClubeCasa, ClubeVisitante, DataPartida, HoraPartida);
     }
 }

@@ -36,12 +36,12 @@ public class Aposta implements ICalcularPontos{
     public Aposta(){
     }
 
-    public Aposta(int idAposta, Participante participante, Partida partida, int PalpiteGolsCasa, int PalpiteGolsVsitante) {
+    public Aposta(int idAposta, Participante participante, Partida partida, int palpiteGolsCasa, int palpiteGolsVsitante) {
         this.idAposta = idAposta;
         this.participante = participante;
         this.partida = partida;
-        this.palpiteGolsCasa = PalpiteGolsCasa;
-        this.palpiteGolsVsitante = PalpiteGolsVsitante;
+        this.palpiteGolsCasa = palpiteGolsCasa;
+        this.palpiteGolsVsitante = palpiteGolsVsitante;
         this.tempoApostar = LocalDateTime.now();
         this.pontosObtidos = 0;
     }
