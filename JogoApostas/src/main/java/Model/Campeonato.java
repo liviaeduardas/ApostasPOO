@@ -21,8 +21,7 @@ public class Campeonato {
 
     // Um campeonato tem vários clubes e um clube pode estar em vários campeonatos
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "campeonato_clubes", //hibernate cria tabela intermediária
+    @JoinTable(name = "campeonato_clubes", //hibernate cria tabela intermediária
             joinColumns = @JoinColumn(name = "campeonato_id"),  // chave do campeonato
             inverseJoinColumns = @JoinColumn(name = "clube_id") // chave do clube
     )
