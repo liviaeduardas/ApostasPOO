@@ -108,6 +108,14 @@ public class Partida {
         this.GolsVisitante = GolsVisitante;
     }
 
+    public Campeonato getCampeonato() {
+        return campeonato;
+    }
+
+    public void setCampeonato(Campeonato campeonato) {
+        this.campeonato = campeonato;
+    }
+
     public boolean isPartidaFinalizada(){
         return PartidaFinalizada;
     }
