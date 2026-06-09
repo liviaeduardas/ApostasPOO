@@ -32,28 +32,6 @@ public class ParticipanteRepository {
     }
 
     /**
-     * Busca um participante pelo nome (ignora maiúsculas/minúsculas).
-     * Retorna null se não encontrar.
-     */
-    public Participante buscarPorParticipante(String nome) {
-        EntityManager entityManager = JPAUtil.getEntityManager();
-        try {
-            TypedQuery<Participante> query = entityManager.createQuery(
-                    "SELECT p FROM Participante p WHERE LOWER(p.nome) = LOWER(:nome)",
-                    Participante.class
-            );
-            query.setParameter("nome", nome.trim());
-            List<Participante> resultado = query.getResultList();
-            return resultado.isEmpty() ? null : resultado.get(0);
-        } catch (Exception e) {
-            System.out.println("Erro ao buscar participante: " + e.getMessage());
-            return null;
-        } finally {
-            entityManager.close();
-        }
-    }
-
-    /**
      * Retorna todos os participantes cadastrados.
      */
     public List<Participante> buscarTodosParticipante() {
@@ -83,6 +61,42 @@ public class ParticipanteRepository {
             entityManager.getTransaction().rollback();
             System.out.println("Erro ao atualizar participante: " + e.getMessage());
             return false;
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    // Busca participante pelo nome de usuário
+    public Participante buscarPorUsuario(String usuario) {
+        EntityManager entityManager = JPAUtil.getEntityManager();
+        try {
+            List<Participante> resultado = entityManager.createQuery(
+                    "SELECT p FROM Participante p WHERE LOWER(p.usuario) = LOWER(:usuario)",
+                    Participante.class
+            ).setParameter("usuario", usuario.trim()).getResultList();
+            return resultado.isEmpty() ? null : resultado.get(0);
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar participante: " + e.getMessage());
+            return null;
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    // Busca participante pelo usuário E senha — usado no login
+    public Participante buscarPorUsuarioESenha(String usuario, String senha) {
+        EntityManager entityManager = JPAUtil.getEntityManager();
+        try {
+            List<Participante> resultado = entityManager.createQuery(
+                            "SELECT p FROM Participante p WHERE LOWER(p.usuario) = LOWER(:usuario) AND p.senha = :senha",
+                            Participante.class
+                    ).setParameter("usuario", usuario.trim())
+                    .setParameter("senha", senha.trim())
+                    .getResultList();
+            return resultado.isEmpty() ? null : resultado.get(0);
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar participante: " + e.getMessage());
+            return null;
         } finally {
             entityManager.close();
         }

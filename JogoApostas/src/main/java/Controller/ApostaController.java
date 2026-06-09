@@ -1,60 +1,76 @@
 package Controller;
+
 import Model.Aposta;
 import Model.Campeonato;
 import Model.Participante;
 import Model.Partida;
-import java.util.ArrayList;
 
+import java.util.List;
+
+import Repository.ApostaRepository;
+import Repository.ParticipanteRepository;
+
+/**
+ * Gerencia apostas.
+ * Salva apostas e atualiza pontuações no banco.
+ */
 public class ApostaController {
-    private ArrayList<Aposta> apostas;
+
+    private ApostaRepository apostaRepository;
+    private ParticipanteRepository participanteRepository;
 
     public ApostaController() {
-        this.apostas = new ArrayList<>();
+        apostaRepository = new ApostaRepository();
+        participanteRepository = new ParticipanteRepository();
     }
 
-    public boolean fazerAposta(Participante participante, Partida partida, int GolsCasa, int GolsVisitante) {
-        if (participante == null || partida == null) return false;
-        if (GolsCasa < 0 || GolsVisitante < 0) return false;
-        if (partida.isPartidaFinalizada()) return false;
+    // Registra uma nova aposta após validações
+    public boolean FazerAposta(Participante participante, Partida partida,
+                               int GolsCasa, int GolsVisitante) {
+        if (participante == null || partida == null)
+            return false;
+        if (GolsCasa < 0 || GolsVisitante < 0)
+            return false;
+        if (partida.isPartidaFinalizada())
+            return false;
 
-        // Cria a aposta corretamente — id 0 pois o banco vai gerar automaticamente
         Aposta aposta = new Aposta(0, participante, partida, GolsCasa, GolsVisitante);
-        if (!aposta.possivelApostar()) return false;
+
+        // Regra de prazo — vive no Model
+        if (!aposta.possivelApostar())
+            return false;
 
         // Verifica duplicata — mesmo participante na mesma partida
-        for (Aposta a : apostas) {
-            if (a.getParticipante() == participante && a.getPartida() == partida) return false;
+        for (Aposta a : apostaRepository.buscarPorParticipante(participante)) {
+            if (a.getPartida() == partida)
+                return false;
         }
-        apostas.add(aposta);
+
         participante.fazerAposta(aposta);
-        return true;
+
+        // Salva a aposta no banco
+        return apostaRepository.salvarAposta(aposta);
     }
 
-    public void calcularPontos(Campeonato campeonato) {
-        for (Aposta aposta : apostas) {
-            if (campeonato.getPartidas().contains(aposta.getPartida()) && aposta.getPartida().isPartidaFinalizada()) {
-                aposta.calcularResultadoAposta();
+    // Calcula pontos e atualiza participantes no banco
+    public void CalcularPontos(Campeonato campeonato) {
+        for (Aposta aposta : apostaRepository.buscarTodasApostas()) {
+            if (campeonato.getPartidas().contains(aposta.getPartida())
+                    && aposta.getPartida().isPartidaFinalizada()) {
+                aposta.calcularResultadoAposta(); // regra no Model
+                apostaRepository.atualizarAposta(aposta);     // atualiza pontos da aposta no banco
+                participanteRepository.atualizarParticipante(aposta.getParticipante()); // atualiza participante no banco
             }
         }
     }
 
-    public ArrayList<Aposta> getApostasPorParticipante(Participante participante) {
-        ArrayList<Aposta> resultado = new ArrayList<>();
-        for (Aposta aposta : apostas) {
-            if (aposta.getParticipante() == participante) resultado.add(aposta);
-        }
-        return resultado;
+    // Retorna todas as apostas de um participante
+    public List<Aposta> getApostasPorParticipante(Participante participante) {
+        return apostaRepository.buscarPorParticipante(participante);
     }
 
-    public ArrayList<Aposta> getApostasPorPartida(Partida partida) {
-        ArrayList<Aposta> resultado = new ArrayList<>();
-        for (Aposta aposta : apostas) {
-            if (aposta.getPartida() == partida) resultado.add(aposta);
-        }
-        return resultado;
-    }
-
-    public ArrayList<Aposta> getApostas() {
-        return apostas;
+    // Retorna todas as apostas
+    public List<Aposta> getApostas() {
+        return apostaRepository.buscarTodasApostas();
     }
 }
