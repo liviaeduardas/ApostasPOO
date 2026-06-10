@@ -51,14 +51,14 @@ public class GrupoController {
     }
 
     // Ranking — regra de ordenação vive no Model
-    public ArrayList<Participante> getRanking(Grupo grupo) {
+    public List<Participante> getRanking(Grupo grupo) {
         if (grupo == null)
             return new ArrayList<>();
         return grupo.getRanking();
     }
 
     // Busca grupo pelo nome no banco
-    public Grupo BuscarNome(String nome) {
+    public Grupo buscarNome(String nome) {
         if (nome == null)
             return null;
         return grupoRepository.buscarPorGrupo(nome);

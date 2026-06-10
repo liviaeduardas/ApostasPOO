@@ -29,9 +29,10 @@
         <properties>
             <!-- Conexão com o banco -->
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/db_apostas?useSSL=false&amp;serverTimezone=UTC"/>
+            <property name="jakarta.persistence.jdbc.url"
+                      value="jdbc:mysql://localhost:3306/db_jogoapostas?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
-            <property name="jakarta.persistence.jdbc.password" value="${DB_PASSWORD}"/> <!-- senha como variável de ambiente -->
+            <property name="jakarta.persistence.jdbc.password" value="Liviaeduarda01!"/> <!-- senha como variável de ambiente -->
 
             <!-- Hibernate -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/> <!-- Mostra pro hibernate que o banco-->

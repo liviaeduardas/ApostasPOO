@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "participante")
 @DiscriminatorValue("PARTICIPANTE")
 public class Participante extends Usuario {
 
