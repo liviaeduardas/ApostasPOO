@@ -1,5 +1,4 @@
 package Controller;
-
 import Model.Aposta;
 import Model.Campeonato;
 import Model.Participante;
