@@ -45,14 +45,15 @@ public class TelaClassificacao extends JPanel {
         String nomeGrupo = (String) comboGrupo.getSelectedItem();
         if (nomeGrupo == null) return;
 
+        // GrupoController.buscarNome (método com B maiúsculo no controller)
         Grupo grupo = grupoController.buscarNome(nomeGrupo);
         if (grupo == null) return;
 
         ArrayList<Participante> ranking = grupoController.getRanking(grupo);
-
         for (int i = 0; i < ranking.size(); i++) {
             Participante p = ranking.get(i);
-            areaRanking.append((i + 1) + "º - " + p.getNome() + " - " + p.getTotalPontos() + " pontos\n");
+            areaRanking.append((i + 1) + "º - " + p.getNome()
+                    + " - " + p.getTotalPontos() + " pontos\n");
         }
     }
 

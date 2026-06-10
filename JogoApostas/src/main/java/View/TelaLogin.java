@@ -28,27 +28,24 @@ public class TelaLogin extends JPanel {
         gbc.insets = new Insets(0, 6, 20, 6);
         add(titulo, gbc);
 
-        // Label Usuário
         gbc.gridwidth = 1;
         gbc.insets = new Insets(4, 6, 4, 6);
+
         gbc.gridx = 0; gbc.gridy = 1;
         add(new JLabel("Usuário:"), gbc);
 
-        // Campo Usuário
         campoUsuario = new JTextField(18);
         gbc.gridx = 1; gbc.gridy = 1;
         add(campoUsuario, gbc);
 
-        // Label Senha
         gbc.gridx = 0; gbc.gridy = 2;
         add(new JLabel("Senha:"), gbc);
 
-        // Campo Senha
         campoSenha = new JPasswordField(18);
         gbc.gridx = 1; gbc.gridy = 2;
         add(campoSenha, gbc);
 
-        // Botão Entrar (centralizado, ocupa as 2 colunas)
+        // Botão Entrar
         JButton entrar = new JButton("Entrar");
         gbc.gridx = 0; gbc.gridy = 3;
         gbc.gridwidth = 2;
@@ -56,13 +53,19 @@ public class TelaLogin extends JPanel {
         add(entrar, gbc);
         entrar.addActionListener(e -> login());
 
-        // Permite login com Enter
+        // Botão Cadastrar
+        JButton cadastrar = new JButton("Cadastrar");
+        gbc.gridy = 4;
+        gbc.insets = new Insets(4, 40, 4, 40);
+        add(cadastrar, gbc);
+        cadastrar.addActionListener(e -> cadastrarNovoUsuario());
+
         campoSenha.addActionListener(e -> login());
     }
 
     private void login() {
         String usuario = campoUsuario.getText();
-        String senha = new String(campoSenha.getPassword());
+        String senha   = new String(campoSenha.getPassword());
         Usuario u = usuarioController.autenticar(usuario, senha);
 
         if (u == null) {
@@ -73,50 +76,69 @@ public class TelaLogin extends JPanel {
         if (u instanceof Administrador) {
             mainFrame.setAdminLogado((Administrador) u);
             mainFrame.trocarTela("telaCadastro");
+            return;
         }
 
         if (u instanceof Participante) {
             Participante participante = (Participante) u;
-            if (participante.getNome() == null) {
-                cadastrarParticipante(participante);
-            } else {
-                mainFrame.setParticipanteLogado(participante);
-                mainFrame.trocarTela("telaApostas");
-            }
+            mainFrame.setParticipanteLogado(participante);
+            escolherGrupoSeNecessario(participante);
+            mainFrame.trocarTela("telaApostas");
         }
     }
 
-    private void cadastrarParticipante(Participante participante) {
-        String nome = JOptionPane.showInputDialog("Digite seu nome:");
-        if (nome == null || nome.isBlank()) return;
-        Participante existente = usuarioController.buscarNome(nome);
-        if (existente != null) {
-            mainFrame.setParticipanteLogado(existente);
-            mainFrame.trocarTela("telaApostas");
+
+    private void cadastrarNovoUsuario() {
+        JTextField fNome    = new JTextField();
+        JTextField fUsuario = new JTextField();
+        JPasswordField fSenha = new JPasswordField();
+
+        Object[] campos = {
+                "Nome:",    fNome,
+                "Usuário:", fUsuario,
+                "Senha:",   fSenha
+        };
+
+        int r = JOptionPane.showConfirmDialog(this, campos, "Novo cadastro",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (r != JOptionPane.OK_OPTION) return;
+
+        String nome    = fNome.getText().trim();
+        String usuario = fUsuario.getText().trim();
+        String senha   = new String(fSenha.getPassword()).trim();
+
+        if (nome.isEmpty() || usuario.isEmpty() || senha.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Preencha todos os campos.");
             return;
         }
 
-        usuarioController.cadastrar(participante, nome);
-
-        ArrayList<Grupo> grupos = mainFrame.getGrupoController().getGrupos();
-        if (!grupos.isEmpty()) {
-            String[] nomes = new String[grupos.size()];
-            for (int i = 0; i < grupos.size(); i++) {
-                nomes[i] = grupos.get(i).getNome();
-            }
-
-            String escolhido = (String) JOptionPane.showInputDialog(
-                    this, "Escolha um grupo:", "Grupo",
-                    JOptionPane.PLAIN_MESSAGE, null, nomes, nomes[0]
-            );
-
-            if (escolhido != null) {
-                Grupo grupo = mainFrame.getGrupoController().buscarNome(escolhido);
-                mainFrame.getGrupoController().addParticipante(grupo, participante);
-            }
+        boolean ok = usuarioController.cadastrar(nome, usuario, senha);
+        if (!ok) {
+            JOptionPane.showMessageDialog(this, "Usuário já existe ou dados inválidos.");
+            return;
         }
 
-        mainFrame.setParticipanteLogado(participante);
-        mainFrame.trocarTela("telaApostas");
+        JOptionPane.showMessageDialog(this, "Cadastro realizado! Faça o login.");
+    }
+
+    private void escolherGrupoSeNecessario(Participante participante) {
+        ArrayList<Grupo> grupos = (ArrayList<Grupo>) mainFrame.getGrupoController().getGrupos();
+        if (grupos == null || grupos.isEmpty()) return;
+
+        for (Grupo g : grupos) {
+            if (g.getParticipantes().contains(participante)) return;
+        }
+
+        String[] nomes = new String[grupos.size()];
+        for (int i = 0; i < grupos.size(); i++) nomes[i] = grupos.get(i).getNome();
+
+        String escolhido = (String) JOptionPane.showInputDialog(
+                this, "Escolha um grupo:", "Grupo",
+                JOptionPane.PLAIN_MESSAGE, null, nomes, nomes[0]);
+
+        if (escolhido != null) {
+            Grupo grupo = mainFrame.getGrupoController().buscarNome(escolhido);
+            mainFrame.getGrupoController().addParticipante(grupo, participante);
+        }
     }
 }

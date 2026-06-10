@@ -31,11 +31,9 @@ public class TelaResultados extends JPanel {
 
         add(topo, BorderLayout.NORTH);
 
-        modelo = new DefaultTableModel();
-        modelo.addColumn("Mandante");
-        modelo.addColumn("Visitante");
-        modelo.addColumn("Placar");
-        modelo.addColumn("Resultado");
+        modelo = new DefaultTableModel(new String[]{"Casa", "Visitante", "Placar", "Resultado"}, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
 
         add(new JScrollPane(new JTable(modelo)), BorderLayout.CENTER);
     }
@@ -53,7 +51,12 @@ public class TelaResultados extends JPanel {
             else if (p.getResultado() == 2) resultado = p.getClubeVisitante().getNome() + " venceu";
             else resultado = "Empate";
 
-            modelo.addRow(new Object[]{p.getClubeCasa().getNome(), p.getClubeVisitante().getNome(), p.getGolsCasa() + " x " + p.getGolsVisitante(), resultado});
+            modelo.addRow(new Object[]{
+                    p.getClubeCasa().getNome(),
+                    p.getClubeVisitante().getNome(),
+                    p.getGolsCasa() + " x " + p.getGolsVisitante(),
+                    resultado
+            });
         }
     }
 
