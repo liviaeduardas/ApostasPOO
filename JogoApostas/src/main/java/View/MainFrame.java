@@ -6,19 +6,15 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
-
     private UsuarioController usuarioController;
     private GrupoController grupoController;
     private CampeonatoController campeonatoController;
     private PartidaController partidaController;
     private ApostaController apostaController;
-
     private Participante participanteLogado;
     private Administrador adminLogado;
-
     private CardLayout cardLayout;
     private JPanel painelPrincipal;
-
     private TelaLogin telaLogin;
     private TelaCadastro telaCadastro;
     private TelaApostas telaApostas;
@@ -26,7 +22,6 @@ public class MainFrame extends JFrame {
     private TelaClassificacao telaClassificacao;
 
     public MainFrame() {
-
         usuarioController = new UsuarioController();
         grupoController = new GrupoController();
         campeonatoController = new CampeonatoController();
@@ -42,11 +37,11 @@ public class MainFrame extends JFrame {
         cardLayout = new CardLayout();
         painelPrincipal = new JPanel(cardLayout);
 
-        painelPrincipal.add(telaLogin, "Login");
-        painelPrincipal.add(telaCadastro, "Cadastro");
-        painelPrincipal.add(telaApostas, "Apostas");
-        painelPrincipal.add(telaResultados, "Resultados");
-        painelPrincipal.add(telaClassificacao, "Classificacao");
+        painelPrincipal.add(telaLogin,          "telaLogin");
+        painelPrincipal.add(telaCadastro,        "telaCadastro");
+        painelPrincipal.add(telaApostas,         "telaApostas");
+        painelPrincipal.add(telaResultados,      "telaResultados");
+        painelPrincipal.add(telaClassificacao,   "telaClassificacao");
 
         add(painelPrincipal);
 
@@ -56,59 +51,56 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
-        trocarTela("Login");
+        trocarTela("telaLogin");
     }
 
     public void trocarTela(String tela) {
-
         cardLayout.show(painelPrincipal, tela);
 
-        if (tela.equals("Apostas")) {
+        if (tela.equals("telaApostas")) {
             telaApostas.atualizar();
         }
-
-        if (tela.equals("Resultados")) {
+        if (tela.equals("telaResultados")) {
             telaResultados.atualizar();
         }
-
-        if (tela.equals("Classificacao")) {
+        if (tela.equals("telaClassificacao")) {
             telaClassificacao.atualizar();
         }
     }
 
-    public Participante getParticipanteLogado() {
+    public Participante getParticipanteLogado(){
         return participanteLogado;
     }
 
-    public void setParticipanteLogado(Participante participanteLogado) {
+    public void setParticipanteLogado(Participante participanteLogado){
         this.participanteLogado = participanteLogado;
     }
 
-    public Administrador getAdminLogado() {
+    public Administrador getAdminLogado(){
         return adminLogado;
     }
 
-    public void setAdminLogado(Administrador adminLogado) {
+    public void setAdminLogado(Administrador adminLogado){
         this.adminLogado = adminLogado;
     }
 
-    public UsuarioController getUsuarioController() {
+    public UsuarioController getUsuarioController(){
         return usuarioController;
     }
 
-    public GrupoController getGrupoController() {
+    public GrupoController getGrupoController(){
         return grupoController;
     }
 
-    public CampeonatoController getCampeonatoController() {
+    public CampeonatoController getCampeonatoController(){
         return campeonatoController;
     }
 
-    public PartidaController getPartidaController() {
+    public PartidaController getPartidaController(){
         return partidaController;
     }
 
-    public ApostaController getApostaController() {
+    public ApostaController getApostaController(){
         return apostaController;
     }
 }

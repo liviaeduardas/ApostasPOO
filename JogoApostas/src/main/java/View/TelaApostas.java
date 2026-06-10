@@ -32,7 +32,7 @@ public class TelaApostas extends JPanel {
         comboPartida = new JComboBox<>();
         add(comboPartida);
 
-        add(new JLabel("Gols mandante:"));
+        add(new JLabel("Gols casa:"));
         txtGolsCasa = new JTextField();
         add(txtGolsCasa);
 
@@ -43,6 +43,14 @@ public class TelaApostas extends JPanel {
         JButton apostar = new JButton("Apostar");
         apostar.addActionListener(e -> fazerAposta());
         add(apostar);
+
+        JButton verResultados = new JButton("Ver Resultados");
+        verResultados.addActionListener(e -> main.trocarTela("telaResultados"));
+        add(verResultados);
+
+        JButton verClassificacao = new JButton("Ver Classificação");
+        verClassificacao.addActionListener(e -> main.trocarTela("telaClassificacao"));
+        add(verClassificacao);
 
         JButton sair = new JButton("Sair");
         sair.addActionListener(e -> main.trocarTela("telaLogin"));
@@ -55,18 +63,17 @@ public class TelaApostas extends JPanel {
             Partida partida = getPartidaSelecionada();
             int golsCasa = Integer.parseInt(txtGolsCasa.getText());
             int golsVisitante = Integer.parseInt(txtGolsVisitante.getText());
-
-            boolean ok = apostaController.fazerAposta(participante, partida, golsCasa, golsVisitante);
+            boolean ok = apostaController.FazerAposta(participante, partida, golsCasa, golsVisitante);
             JOptionPane.showMessageDialog(this, ok ? "Aposta realizada!" : "Não foi possível apostar.");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Digite valores válidos.");
+            if (ok) { txtGolsCasa.setText(""); txtGolsVisitante.setText(""); }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Digite valores numéricos para os gols.");
         }
     }
 
     private void carregarPartidas() {
         comboPartida.removeAllItems();
-        Campeonato campeonato = campeonatoController.procurarCampeonato(
-                (String) comboCampeonato.getSelectedItem());
+        Campeonato campeonato = campeonatoController.procurarCampeonato((String) comboCampeonato.getSelectedItem());
         if (campeonato == null) return;
         for (Partida p : campeonato.getPartidas())
             if (!p.isPartidaFinalizada())
