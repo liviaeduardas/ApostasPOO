@@ -14,22 +14,22 @@ public class Grupo {
     private String nome;
 
     // Um grupo tem vários participantes e um participante pode estar em vários grupos
-    @ManyToMany(fetch = FetchType.LAZY) // grupos são carregadas do banco so quando chamar
+    @ManyToMany(fetch = FetchType.EAGER) // grupos são carregadas do banco so quando chamar
     @JoinTable(
             name = "grupo_participantes",                        // nome da tabela intermediária
             joinColumns = @JoinColumn(name = "grupo_id"),        // chave do grupo
             inverseJoinColumns = @JoinColumn(name = "participante_id") // chave do participante
     )
-    private ArrayList<Participante> participantes;
+    private List<Participante> participantes;
 
     public Grupo(){
-        this.participantes = new ArrayList<>();
+        this.participantes = new ArrayList();
     }
 
     public Grupo(int id, String nome) {
         this.id = id;
         this.nome = nome;
-        this.participantes = new ArrayList<>();
+        this.participantes = new ArrayList();
     }
 
     public boolean addParticipante(Participante participante){
@@ -43,7 +43,7 @@ public class Grupo {
         }
     }
 
-    public ArrayList<Participante> getRanking() {
+    public List<Participante> getRanking() {
         ArrayList<Participante> ranking = new ArrayList<>(participantes);
         for (int i = 0; i < ranking.size(); i++) {
             for (int j = i + 1; j < ranking.size(); j++) {
@@ -77,11 +77,11 @@ public class Grupo {
         this.nome = nome;
     }
 
-    public ArrayList<Participante> getParticipantes(){
+    public List<Participante> getParticipantes(){
         return participantes;
     }
 
-    public void setParticipantes(ArrayList<Participante> participantes){
+    public void setParticipantes(List<Participante> participantes){
         this.participantes = participantes;
     }
 }

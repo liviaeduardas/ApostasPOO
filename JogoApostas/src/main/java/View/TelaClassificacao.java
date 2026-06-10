@@ -5,6 +5,7 @@ import Model.Participante;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TelaClassificacao extends JPanel {
     private MainFrame main;
@@ -49,7 +50,7 @@ public class TelaClassificacao extends JPanel {
         Grupo grupo = grupoController.buscarNome(nomeGrupo);
         if (grupo == null) return;
 
-        ArrayList<Participante> ranking = grupoController.getRanking(grupo);
+        List<Participante> ranking = grupoController.getRanking(grupo);
         for (int i = 0; i < ranking.size(); i++) {
             Participante p = ranking.get(i);
             areaRanking.append((i + 1) + "º - " + p.getNome()
