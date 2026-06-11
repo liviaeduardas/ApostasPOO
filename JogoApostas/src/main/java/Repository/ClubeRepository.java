@@ -53,4 +53,22 @@ public class ClubeRepository {
             entityManager.close();
         }
     }
+
+    public Clube buscarPorNome(String nome) {
+        EntityManager entityManager = JPAUtil.getEntityManager();
+        try {
+            List<Clube> lista = entityManager.createQuery(
+                            "SELECT c FROM Clube c WHERE LOWER(c.nome) = LOWER(:n)", Clube.class)
+                    .setParameter("n", nome)
+                    .getResultList();
+            entityManager.close();
+            return lista.isEmpty() ? null : lista.get(0);
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar clubes: " + e.getMessage());
+            return null;
+        } finally {
+            entityManager.close();
+        }
+
+    }
 }
