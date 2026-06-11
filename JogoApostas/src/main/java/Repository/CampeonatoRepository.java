@@ -45,11 +45,15 @@ public class CampeonatoRepository {
     public Campeonato buscarPorCampeonato(String nome) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
-            List<Campeonato> resultado = entityManager.createQuery(
-                    "SELECT c FROM Campeonato c WHERE LOWER(c.nome) = LOWER(:nome)",
-                    Campeonato.class
-            ).setParameter("nome", nome.trim()).getResultList();
-            return resultado.isEmpty() ? null : resultado.get(0);
+            List<Campeonato> lista = entityManager.createQuery(
+                            "SELECT DISTINCT c FROM Campeonato c " +
+                                    "LEFT JOIN FETCH c.clubes " +
+                                    "LEFT JOIN FETCH c.partidas " +
+                                    "WHERE LOWER(c.nome) = LOWER(:n)", Campeonato.class)
+                    .setParameter("n", nome)
+                    .getResultList();
+            entityManager.close();
+            return lista.isEmpty() ? null : lista.get(0);
         } catch (Exception e) {
             System.out.println("Erro ao buscar campeonato: " + e.getMessage());
             return null;

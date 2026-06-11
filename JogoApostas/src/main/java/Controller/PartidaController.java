@@ -23,16 +23,18 @@ public class PartidaController {
     }
 
     // Cria e cadastra uma nova partida no campeonato
-    public boolean cadastrarPartida(Campeonato campeonato, Clube ClubeCasa,
-                                    Clube ClubeVisitante, LocalDate DataPartida, LocalTime HoraPartida) {
-        if (campeonato == null || ClubeCasa == null || ClubeVisitante == null)
+    public boolean cadastrarPartida(Campeonato campeonato, Clube clubeCasa,
+                                    Clube clubeVisitante, LocalDate DataPartida, LocalTime HoraPartida) {
+        if (campeonato == null || clubeCasa == null || clubeVisitante == null)
             return false;
         if (DataPartida == null || HoraPartida == null)
             return false;
-        if (ClubeCasa.equals(ClubeVisitante))
+        if (clubeCasa.equals(clubeVisitante))
             return false;
 
-        PartidaRegular nova = new PartidaRegular(ClubeCasa, ClubeVisitante, DataPartida, HoraPartida);
+
+
+        PartidaRegular nova = new PartidaRegular(clubeCasa, clubeVisitante, DataPartida, HoraPartida);
         nova.setCampeonato(campeonato); // liga a partida ao campeonato
 
         boolean adicionou = campeonato.addPartida(nova); // regra no Model
