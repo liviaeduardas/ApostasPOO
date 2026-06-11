@@ -1,12 +1,15 @@
 package View;
+
 import Controller.ApostaController;
 import Controller.CampeonatoController;
 import Controller.GrupoController;
 import Model.*;
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class TelaApostas extends JPanel {
+
     private MainFrame main;
     private ApostaController apostaController;
     private CampeonatoController campeonatoController;
@@ -15,9 +18,10 @@ public class TelaApostas extends JPanel {
     private JTextField txtGolsCasa;
     private JTextField txtGolsVisitante;
 
-    public TelaApostas(MainFrame main, ApostaController apostaController, CampeonatoController campeonatoController, GrupoController grupoController) {
-        this.main = main;
-        this.apostaController = apostaController;
+    public TelaApostas(MainFrame main, ApostaController apostaController,
+                       CampeonatoController campeonatoController, GrupoController grupoController) {
+        this.main                 = main;
+        this.apostaController     = apostaController;
         this.campeonatoController = campeonatoController;
 
         setLayout(new GridLayout(0, 1, 5, 5));
@@ -25,6 +29,7 @@ public class TelaApostas extends JPanel {
 
         add(new JLabel("Campeonato:"));
         comboCampeonato = new JComboBox<>();
+        // Ao trocar campeonato, carrega automaticamente as partidas
         comboCampeonato.addActionListener(e -> carregarPartidas());
         add(comboCampeonato);
 
@@ -60,12 +65,30 @@ public class TelaApostas extends JPanel {
     private void fazerAposta() {
         try {
             Participante participante = main.getParticipanteLogado();
+            if (participante == null) {
+                JOptionPane.showMessageDialog(this, "Nenhum participante logado!");
+                return;
+            }
+
             Partida partida = getPartidaSelecionada();
-            int golsCasa = Integer.parseInt(txtGolsCasa.getText());
-            int golsVisitante = Integer.parseInt(txtGolsVisitante.getText());
+            if (partida == null) {
+                JOptionPane.showMessageDialog(this, "Selecione uma partida!");
+                return;
+            }
+
+            if (txtGolsCasa.getText().trim().isEmpty() || txtGolsVisitante.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Preencha os gols!");
+                return;
+            }
+
+            int golsCasa      = Integer.parseInt(txtGolsCasa.getText().trim());
+            int golsVisitante = Integer.parseInt(txtGolsVisitante.getText().trim());
+
             boolean ok = apostaController.FazerAposta(participante, partida, golsCasa, golsVisitante);
-            JOptionPane.showMessageDialog(this, ok ? "Aposta realizada!" : "Não foi possível apostar.");
+            JOptionPane.showMessageDialog(this, ok ? "Aposta realizada!" : "Não foi possível apostar.\nVerifique se já apostou nessa partida ou se o prazo encerrou.");
+
             if (ok) { txtGolsCasa.setText(""); txtGolsVisitante.setText(""); }
+
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Digite valores numéricos para os gols.");
         }
@@ -73,19 +96,33 @@ public class TelaApostas extends JPanel {
 
     private void carregarPartidas() {
         comboPartida.removeAllItems();
-        Campeonato campeonato = campeonatoController.procurarCampeonato((String) comboCampeonato.getSelectedItem());
+        String nomeCamp = (String) comboCampeonato.getSelectedItem();
+        if (nomeCamp == null) return;
+
+        // Busca fresco do banco para garantir dados atualizados
+        Campeonato campeonato = campeonatoController.procurarCampeonato(nomeCamp);
         if (campeonato == null) return;
-        for (Partida p : campeonato.getPartidas())
-            if (!p.isPartidaFinalizada())
-                comboPartida.addItem(p.toString());
+
+        // Mostra apenas partidas não finalizadas com nome dos times
+        List<Partida> pendentes = campeonatoController.getPartidasPendentes(campeonato);
+        for (Partida p : pendentes)
+            // Exibe: "Flamengo x Corinthians" em vez do toString padrão
+            comboPartida.addItem(p.getClubeCasa().getNome() + " x " + p.getClubeVisitante().getNome());
     }
 
     private Partida getPartidaSelecionada() {
-        String texto = (String) comboPartida.getSelectedItem();
-        if (texto == null) return null;
-        for (Campeonato c : campeonatoController.getCampeonatos())
-            for (Partida p : c.getPartidas())
-                if (p.toString().equals(texto)) return p;
+        String texto   = (String) comboPartida.getSelectedItem();
+        String nomeCamp = (String) comboCampeonato.getSelectedItem();
+        if (texto == null || nomeCamp == null) return null;
+
+        Campeonato campeonato = campeonatoController.procurarCampeonato(nomeCamp);
+        if (campeonato == null) return null;
+
+        // Busca a partida pelo nome dos times
+        for (Partida p : campeonato.getPartidas()) {
+            String nomePartida = p.getClubeCasa().getNome() + " x " + p.getClubeVisitante().getNome();
+            if (nomePartida.equals(texto)) return p;
+        }
         return null;
     }
 
