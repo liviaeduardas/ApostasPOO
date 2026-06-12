@@ -4,9 +4,9 @@ import Controller.ApostaController;
 import Controller.GrupoController;
 import Model.Grupo;
 import Model.Participante;
-
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TelaClassificacao extends JPanel {
@@ -33,7 +33,7 @@ public class TelaClassificacao extends JPanel {
         topo.add(comboGrupo);
 
         JButton atualizar = new JButton("Atualizar");
-        atualizar.addActionListener(e -> mostrarRanking());
+        atualizar.addActionListener(e -> atualizar());
         topo.add(atualizar);
 
         JButton voltar = new JButton("Voltar");
@@ -44,6 +44,7 @@ public class TelaClassificacao extends JPanel {
 
         areaRanking = new JTextArea();
         areaRanking.setEditable(false);
+        areaRanking.setFont(new Font("Monospaced", Font.PLAIN, 13));
         add(new JScrollPane(areaRanking), BorderLayout.CENTER);
     }
 
@@ -56,23 +57,32 @@ public class TelaClassificacao extends JPanel {
         Grupo grupo = grupoController.buscarNome(nomeGrupo);
         if (grupo == null) return;
 
-        // Ordena os participantes pelo total de pontos buscado do banco
+        // Busca participantes diretamente do grupo — sem acessar lista lazy
         List<Participante> participantes = grupo.getParticipantes();
         if (participantes.isEmpty()) {
             areaRanking.append("Nenhum participante neste grupo ainda.\n");
             return;
         }
 
-        // Ordena manualmente por pontos vindos do banco (evita acessar lista lazy)
-        List<Participante> ranking = new java.util.ArrayList<>(participantes);
-        ranking.sort((a, b) ->
+        // Remove duplicatas por id antes de ordenar
+        List<Participante> semDuplicatas = new ArrayList<>();
+        List<Integer> idsVistos = new ArrayList<>();
+        for (Participante p : participantes) {
+            if (!idsVistos.contains(p.getId())) {
+                idsVistos.add(p.getId());
+                semDuplicatas.add(p);
+            }
+        }
+
+        // Ordena por pontos (maior primeiro) — pontos calculados via apostas no banco
+        semDuplicatas.sort((a, b) ->
                 apostaController.getTotalPontosPorParticipante(b)
                         - apostaController.getTotalPontosPorParticipante(a));
 
-        for (int i = 0; i < ranking.size(); i++) {
-            Participante p = ranking.get(i);
+        for (int i = 0; i < semDuplicatas.size(); i++) {
+            Participante p = semDuplicatas.get(i);
             int pontos = apostaController.getTotalPontosPorParticipante(p);
-            areaRanking.append((i + 1) + "º - " + p.getNome() + " - " + pontos + " pontos\n");
+            areaRanking.append((i + 1) + "º  " + p.getNome() + "  —  " + pontos + " pontos\n");
         }
     }
 
@@ -80,5 +90,6 @@ public class TelaClassificacao extends JPanel {
         comboGrupo.removeAllItems();
         for (Grupo g : grupoController.getGrupos())
             comboGrupo.addItem(g.getNome());
+        mostrarRanking();
     }
 }
