@@ -1,59 +1,50 @@
 package View;
+
 import Controller.UsuarioController;
 import Model.*;
+
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.List;
 
 public class TelaLogin extends JPanel {
-    private MainFrame mainFrame;
+    private MainFrame         mainFrame;
     private UsuarioController usuarioController;
-    private JTextField campoUsuario;
-    private JPasswordField campoSenha;
+    private JTextField        campoUsuario;
+    private JPasswordField    campoSenha;
 
     public TelaLogin(MainFrame mainFrame, UsuarioController usuarioController) {
-        this.mainFrame = mainFrame;
+        this.mainFrame         = mainFrame;
         this.usuarioController = usuarioController;
 
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(6, 6, 6, 6);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
 
-        // Título
         JLabel titulo = new JLabel("Sistema de Apostas", SwingConstants.CENTER);
         titulo.setFont(new Font("SansSerif", Font.BOLD, 22));
-        gbc.gridx = 0; gbc.gridy = 0;
-        gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         gbc.insets = new Insets(0, 6, 20, 6);
         add(titulo, gbc);
 
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(4, 6, 4, 6);
+        gbc.insets    = new Insets(4, 6, 4, 6);
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        add(new JLabel("Usuário:"), gbc);
-
+        gbc.gridx = 0; gbc.gridy = 1; add(new JLabel("Usuário:"), gbc);
         campoUsuario = new JTextField(18);
-        gbc.gridx = 1; gbc.gridy = 1;
-        add(campoUsuario, gbc);
+        gbc.gridx = 1; gbc.gridy = 1; add(campoUsuario, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
-        add(new JLabel("Senha:"), gbc);
-
+        gbc.gridx = 0; gbc.gridy = 2; add(new JLabel("Senha:"), gbc);
         campoSenha = new JPasswordField(18);
-        gbc.gridx = 1; gbc.gridy = 2;
-        add(campoSenha, gbc);
+        gbc.gridx = 1; gbc.gridy = 2; add(campoSenha, gbc);
 
-        // Botão Entrar
         JButton entrar = new JButton("Entrar");
-        gbc.gridx = 0; gbc.gridy = 3;
-        gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
         gbc.insets = new Insets(16, 40, 4, 40);
         add(entrar, gbc);
         entrar.addActionListener(e -> login());
 
-        // Botão Cadastrar
         JButton cadastrar = new JButton("Cadastrar");
         gbc.gridy = 4;
         gbc.insets = new Insets(4, 40, 4, 40);
@@ -64,7 +55,7 @@ public class TelaLogin extends JPanel {
     }
 
     private void login() {
-        String usuario = campoUsuario.getText();
+        String usuario = campoUsuario.getText().trim();
         String senha   = new String(campoSenha.getPassword());
         Usuario u = usuarioController.autenticar(usuario, senha);
 
@@ -87,17 +78,12 @@ public class TelaLogin extends JPanel {
         }
     }
 
-
     private void cadastrarNovoUsuario() {
-        JTextField fNome    = new JTextField();
-        JTextField fUsuario = new JTextField();
-        JPasswordField fSenha = new JPasswordField();
+        JTextField     fNome    = new JTextField();
+        JTextField     fUsuario = new JTextField();
+        JPasswordField fSenha   = new JPasswordField();
 
-        Object[] campos = {
-                "Nome:",    fNome,
-                "Usuário:", fUsuario,
-                "Senha:",   fSenha
-        };
+        Object[] campos = { "Nome:", fNome, "Usuário:", fUsuario, "Senha:", fSenha };
 
         int r = JOptionPane.showConfirmDialog(this, campos, "Novo cadastro",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -117,16 +103,23 @@ public class TelaLogin extends JPanel {
             JOptionPane.showMessageDialog(this, "Usuário já existe ou dados inválidos.");
             return;
         }
-
         JOptionPane.showMessageDialog(this, "Cadastro realizado! Faça o login.");
     }
 
+    /**
+     * Verifica se o participante JÁ está em algum grupo comparando pelo ID
+     * (evita falso negativo por comparação de referência de objeto).
+     * Só oferece escolha de grupo se ainda não pertencer a nenhum.
+     */
     private void escolherGrupoSeNecessario(Participante participante) {
-        ArrayList<Grupo> grupos = (ArrayList<Grupo>) mainFrame.getGrupoController().getGrupos();
+        List<Grupo> grupos = mainFrame.getGrupoController().getGrupos();
         if (grupos == null || grupos.isEmpty()) return;
 
+        // Compara por ID, não por referência
         for (Grupo g : grupos) {
-            if (g.getParticipantes().contains(participante)) return;
+            for (Participante p : g.getParticipantes()) {
+                if (p.getId() == participante.getId()) return; // já está em um grupo
+            }
         }
 
         String[] nomes = new String[grupos.size()];

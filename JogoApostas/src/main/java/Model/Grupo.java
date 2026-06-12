@@ -44,17 +44,7 @@ public class Grupo {
     }
 
     public List<Participante> getRanking() {
-        ArrayList<Participante> ranking = new ArrayList<>(participantes);
-        for (int i = 0; i < ranking.size(); i++) {
-            for (int j = i + 1; j < ranking.size(); j++) {
-                if (ranking.get(j).getTotalPontos() > ranking.get(i).getTotalPontos()) {
-                    Participante aux = ranking.get(i);
-                    ranking.set(i, ranking.get(j));
-                    ranking.set(j, aux);
-                }
-            }
-        }
-        return ranking;
+        return new ArrayList<>(participantes);
     }
 
     public String toString(){
