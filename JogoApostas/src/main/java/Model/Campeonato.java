@@ -20,7 +20,7 @@ public class Campeonato {
     private int ano;
 
     // Um campeonato tem vários clubes e um clube pode estar em vários campeonatos
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "campeonato_clubes", //hibernate cria tabela intermediária
             joinColumns = @JoinColumn(name = "campeonato_id"),  // chave do campeonato
             inverseJoinColumns = @JoinColumn(name = "clube_id") // chave do clube
@@ -31,7 +31,7 @@ public class Campeonato {
     @OneToMany( //define relação entre a tabela
             mappedBy = "campeonato", // na campeonato partidas terá um atributo campeonato
             cascade = CascadeType.ALL, // defini que deve fazer  tudo com uma tabela o que ocorrer com a outra
-            fetch = FetchType.LAZY)// apostas são carregadas do banco so quando chamar
+            fetch = FetchType.EAGER)// apostas são carregadas do banco so quando chamar
     private List<Partida> partidas;
 
     public Campeonato(){
