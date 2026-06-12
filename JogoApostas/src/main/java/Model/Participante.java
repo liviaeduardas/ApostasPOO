@@ -28,17 +28,13 @@ public class Participante extends Usuario {
         System.out.println("Participante autenticado: " + getNome());
     }
 
-    public void fazerAposta(Aposta aposta){
-        apostas.add(aposta);
+    public void fazerAposta(Aposta aposta) {
     }
 
-    public int getTotalPontos() {
-        int total = 0;
-        for (Aposta aposta : apostas){
-            total += aposta.getPontosObtidos();
-        }
-        return total;
 
+    public int getTotalPontos() {
+        // Não itera a lista lazy — o valor é calculado pelo ApostaRepository
+        return 0; // valor placeholder; o real vem do banco
     }
 
     public List<Aposta> getApostas(){

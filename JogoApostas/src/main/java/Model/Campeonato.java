@@ -119,6 +119,9 @@ public class Campeonato {
         this.ano = ano;
     }
 
+    public int getId() {
+        return id;
+    }
     public List<Clube> getClubes(){
         return clubes;
     }

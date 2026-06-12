@@ -139,4 +139,9 @@ public class Partida {
         }
         return 0; //empate
     }
+
+    public int getId() {
+        return id;
+    }
+
 }

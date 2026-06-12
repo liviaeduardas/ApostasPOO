@@ -1,21 +1,27 @@
 package View;
+
+import Controller.ApostaController;
 import Controller.GrupoController;
 import Model.Grupo;
 import Model.Participante;
+
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TelaClassificacao extends JPanel {
-    private MainFrame main;
-    private GrupoController grupoController;
-    private JComboBox<String> comboGrupo;
-    private JTextArea areaRanking;
 
-    public TelaClassificacao(MainFrame main, GrupoController grupoController) {
-        this.main = main;
-        this.grupoController = grupoController;
+    private MainFrame        main;
+    private GrupoController  grupoController;
+    private ApostaController apostaController;
+    private JComboBox<String> comboGrupo;
+    private JTextArea         areaRanking;
+
+    public TelaClassificacao(MainFrame main, GrupoController grupoController,
+                             ApostaController apostaController) {
+        this.main             = main;
+        this.grupoController  = grupoController;
+        this.apostaController = apostaController;
 
         setLayout(new BorderLayout(5, 5));
 
@@ -23,6 +29,7 @@ public class TelaClassificacao extends JPanel {
         topo.add(new JLabel("Grupo:"));
 
         comboGrupo = new JComboBox<>();
+        comboGrupo.addActionListener(e -> mostrarRanking());
         topo.add(comboGrupo);
 
         JButton atualizar = new JButton("Atualizar");
@@ -46,15 +53,26 @@ public class TelaClassificacao extends JPanel {
         String nomeGrupo = (String) comboGrupo.getSelectedItem();
         if (nomeGrupo == null) return;
 
-        // GrupoController.buscarNome (método com B maiúsculo no controller)
         Grupo grupo = grupoController.buscarNome(nomeGrupo);
         if (grupo == null) return;
 
-        List<Participante> ranking = grupoController.getRanking(grupo);
+        // Ordena os participantes pelo total de pontos buscado do banco
+        List<Participante> participantes = grupo.getParticipantes();
+        if (participantes.isEmpty()) {
+            areaRanking.append("Nenhum participante neste grupo ainda.\n");
+            return;
+        }
+
+        // Ordena manualmente por pontos vindos do banco (evita acessar lista lazy)
+        List<Participante> ranking = new java.util.ArrayList<>(participantes);
+        ranking.sort((a, b) ->
+                apostaController.getTotalPontosPorParticipante(b)
+                        - apostaController.getTotalPontosPorParticipante(a));
+
         for (int i = 0; i < ranking.size(); i++) {
             Participante p = ranking.get(i);
-            areaRanking.append((i + 1) + "º - " + p.getNome()
-                    + " - " + p.getTotalPontos() + " pontos\n");
+            int pontos = apostaController.getTotalPontosPorParticipante(p);
+            areaRanking.append((i + 1) + "º - " + p.getNome() + " - " + pontos + " pontos\n");
         }
     }
 
@@ -62,6 +80,5 @@ public class TelaClassificacao extends JPanel {
         comboGrupo.removeAllItems();
         for (Grupo g : grupoController.getGrupos())
             comboGrupo.addItem(g.getNome());
-        mostrarRanking();
     }
 }

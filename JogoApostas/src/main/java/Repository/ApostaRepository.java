@@ -6,67 +6,86 @@ import Util.JPAUtil;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 
-/**
- * Responsável por salvar e buscar Apostas no banco de dados.
- */
 public class ApostaRepository {
 
     public boolean salvarAposta(Aposta aposta) {
-        EntityManager entityManager = JPAUtil.getEntityManager();
+        EntityManager em = JPAUtil.getEntityManager();
         try {
-            entityManager.getTransaction().begin();
-            entityManager.persist(aposta);
-            entityManager.getTransaction().commit();
+            em.getTransaction().begin();
+            em.persist(aposta);
+            em.getTransaction().commit();
             return true;
         } catch (Exception e) {
-            entityManager.getTransaction().rollback();
+            em.getTransaction().rollback();
             System.out.println("Erro ao salvar aposta: " + e.getMessage());
             return false;
         } finally {
-            entityManager.close();
+            em.close();
         }
     }
 
     public boolean atualizarAposta(Aposta aposta) {
-        EntityManager entityManager = JPAUtil.getEntityManager();
+        EntityManager em = JPAUtil.getEntityManager();
         try {
-            entityManager.getTransaction().begin();
-            entityManager.merge(aposta);
-            entityManager.getTransaction().commit();
+            em.getTransaction().begin();
+            em.merge(aposta);
+            em.getTransaction().commit();
             return true;
         } catch (Exception e) {
-            entityManager.getTransaction().rollback();
+            em.getTransaction().rollback();
             System.out.println("Erro ao atualizar aposta: " + e.getMessage());
             return false;
         } finally {
-            entityManager.close();
+            em.close();
         }
     }
 
     public List<Aposta> buscarPorParticipante(Participante participante) {
-        EntityManager entityManager = JPAUtil.getEntityManager();
+        EntityManager em = JPAUtil.getEntityManager();
         try {
-            return entityManager.createQuery(
-                "SELECT a FROM Aposta a WHERE a.participante = :participante",
-                Aposta.class
-            ).setParameter("participante", participante).getResultList();
+            return em.createQuery(
+                            "SELECT a FROM Aposta a WHERE a.participante = :p", Aposta.class)
+                    .setParameter("p", participante)
+                    .getResultList();
         } catch (Exception e) {
             System.out.println("Erro ao buscar apostas: " + e.getMessage());
             return List.of();
         } finally {
-            entityManager.close();
+            em.close();
+        }
+    }
+
+    /**
+     * Busca apostas pelo ID da partida — usado para calcular pontos após resultado.
+     * Carrega participante e partida com JOIN FETCH para evitar LazyInitializationException.
+     */
+    public List<Aposta> buscarPorPartida(int partidaId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT a FROM Aposta a " +
+                                    "JOIN FETCH a.participante " +
+                                    "JOIN FETCH a.partida " +
+                                    "WHERE a.partida.id = :id", Aposta.class)
+                    .setParameter("id", partidaId)
+                    .getResultList();
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar apostas por partida: " + e.getMessage());
+            return List.of();
+        } finally {
+            em.close();
         }
     }
 
     public List<Aposta> buscarTodasApostas() {
-        EntityManager entityManager = JPAUtil.getEntityManager();
+        EntityManager em = JPAUtil.getEntityManager();
         try {
-            return entityManager.createQuery("SELECT a FROM Aposta a", Aposta.class).getResultList();
+            return em.createQuery("SELECT a FROM Aposta a", Aposta.class).getResultList();
         } catch (Exception e) {
             System.out.println("Erro ao buscar apostas: " + e.getMessage());
             return List.of();
         } finally {
-            entityManager.close();
+            em.close();
         }
     }
 }

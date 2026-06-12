@@ -4,22 +4,29 @@ import Controller.ApostaController;
 import Controller.CampeonatoController;
 import Controller.GrupoController;
 import Model.*;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TelaApostas extends JPanel {
 
-    private MainFrame main;
-    private ApostaController apostaController;
-    private CampeonatoController campeonatoController;
+    private MainFrame             main;
+    private ApostaController      apostaController;
+    private CampeonatoController  campeonatoController;
+
     private JComboBox<String> comboCampeonato;
     private JComboBox<String> comboPartida;
-    private JTextField txtGolsCasa;
-    private JTextField txtGolsVisitante;
+    private JTextField        txtGolsCasa;
+    private JTextField        txtGolsVisitante;
+
+    // Lista paralela ao comboPartida — guarda os objetos Partida na mesma ordem
+    private final List<Partida> partidasExibidas = new ArrayList<>();
 
     public TelaApostas(MainFrame main, ApostaController apostaController,
-                       CampeonatoController campeonatoController, GrupoController grupoController) {
+                       CampeonatoController campeonatoController,
+                       GrupoController grupoController) {
         this.main                 = main;
         this.apostaController     = apostaController;
         this.campeonatoController = campeonatoController;
@@ -29,7 +36,6 @@ public class TelaApostas extends JPanel {
 
         add(new JLabel("Campeonato:"));
         comboCampeonato = new JComboBox<>();
-        // Ao trocar campeonato, carrega automaticamente as partidas
         comboCampeonato.addActionListener(e -> carregarPartidas());
         add(comboCampeonato);
 
@@ -62,22 +68,19 @@ public class TelaApostas extends JPanel {
         add(sair);
     }
 
+    // -------------------------------------------------------------------------
+
     private void fazerAposta() {
         try {
             Participante participante = main.getParticipanteLogado();
             if (participante == null) {
-                JOptionPane.showMessageDialog(this, "Nenhum participante logado!");
+                JOptionPane.showMessageDialog(this, "Nenhum participante logado.");
                 return;
             }
 
             Partida partida = getPartidaSelecionada();
             if (partida == null) {
-                JOptionPane.showMessageDialog(this, "Selecione uma partida!");
-                return;
-            }
-
-            if (txtGolsCasa.getText().trim().isEmpty() || txtGolsVisitante.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Preencha os gols!");
+                JOptionPane.showMessageDialog(this, "Selecione uma partida.");
                 return;
             }
 
@@ -85,7 +88,9 @@ public class TelaApostas extends JPanel {
             int golsVisitante = Integer.parseInt(txtGolsVisitante.getText().trim());
 
             boolean ok = apostaController.FazerAposta(participante, partida, golsCasa, golsVisitante);
-            JOptionPane.showMessageDialog(this, ok ? "Aposta realizada!" : "Não foi possível apostar.\nVerifique se já apostou nessa partida ou se o prazo encerrou.");
+            JOptionPane.showMessageDialog(this, ok
+                    ? "Aposta realizada!"
+                    : "Não foi possível apostar (prazo encerrado, partida finalizada ou aposta duplicada).");
 
             if (ok) { txtGolsCasa.setText(""); txtGolsVisitante.setText(""); }
 
@@ -94,42 +99,47 @@ public class TelaApostas extends JPanel {
         }
     }
 
+    /**
+     * Recarrega o combo de partidas com as partidas PENDENTES do campeonato selecionado.
+     * Mantém a lista paralela "partidasExibidas" sincronizada para recuperar o
+     * objeto Partida pelo índice — sem depender de toString().
+     */
     private void carregarPartidas() {
         comboPartida.removeAllItems();
-        String nomeCamp = (String) comboCampeonato.getSelectedItem();
-        if (nomeCamp == null) return;
+        partidasExibidas.clear();
 
-        // Busca fresco do banco para garantir dados atualizados
-        Campeonato campeonato = campeonatoController.procurarCampeonato(nomeCamp);
+        Campeonato campeonato = campeonatoController.procurarCampeonato(
+                (String) comboCampeonato.getSelectedItem());
         if (campeonato == null) return;
 
-        // Mostra apenas partidas não finalizadas com nome dos times
-        List<Partida> pendentes = campeonatoController.getPartidasPendentes(campeonato);
-        for (Partida p : pendentes)
-            // Exibe: "Flamengo x Corinthians" em vez do toString padrão
-            comboPartida.addItem(p.getClubeCasa().getNome() + " x " + p.getClubeVisitante().getNome());
-    }
-
-    private Partida getPartidaSelecionada() {
-        String texto   = (String) comboPartida.getSelectedItem();
-        String nomeCamp = (String) comboCampeonato.getSelectedItem();
-        if (texto == null || nomeCamp == null) return null;
-
-        Campeonato campeonato = campeonatoController.procurarCampeonato(nomeCamp);
-        if (campeonato == null) return null;
-
-        // Busca a partida pelo nome dos times
         for (Partida p : campeonato.getPartidas()) {
-            String nomePartida = p.getClubeCasa().getNome() + " x " + p.getClubeVisitante().getNome();
-            if (nomePartida.equals(texto)) return p;
+            if (!p.isPartidaFinalizada()) {
+                comboPartida.addItem(
+                        p.getClubeCasa().getNome() + " x " + p.getClubeVisitante().getNome());
+                partidasExibidas.add(p);
+            }
         }
-        return null;
     }
 
+    /**
+     * Retorna o objeto Partida correspondente ao item selecionado no combo,
+     * usando a lista paralela (índice garantido consistente).
+     */
+    private Partida getPartidaSelecionada() {
+        int idx = comboPartida.getSelectedIndex();
+        if (idx < 0 || idx >= partidasExibidas.size()) return null;
+        return partidasExibidas.get(idx);
+    }
+
+    /**
+     * Chamado pelo MainFrame toda vez que a tela de apostas é exibida.
+     * Recarrega campeonatos e partidas com dados frescos do banco.
+     */
     public void atualizar() {
         comboCampeonato.removeAllItems();
+        partidasExibidas.clear();
         for (Campeonato c : campeonatoController.getCampeonatos())
             comboCampeonato.addItem(c.getNome());
-        carregarPartidas();
+
     }
 }

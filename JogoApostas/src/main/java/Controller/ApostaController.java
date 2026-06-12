@@ -63,6 +63,14 @@ public class ApostaController {
         }
     }
 
+    public int getTotalPontosPorParticipante(Participante participante) {
+        int total = 0;
+        for (Aposta a : apostaRepository.buscarPorParticipante(participante)) {
+            total += a.getPontosObtidos();
+        }
+        return total;
+    }
+
     // Retorna todas as apostas de um participante
     public List<Aposta> getApostasPorParticipante(Participante participante) {
         return apostaRepository.buscarPorParticipante(participante);
