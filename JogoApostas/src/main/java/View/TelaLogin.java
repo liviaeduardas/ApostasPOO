@@ -73,8 +73,8 @@ public class TelaLogin extends JPanel {
         if (u instanceof Participante) {
             Participante participante = (Participante) u;
             mainFrame.setParticipanteLogado(participante);
-            escolherGrupoSeNecessario(participante);
-            mainFrame.trocarTela("telaApostas");
+            boolean entrou = escolherGrupoSeNecessario(participante);
+            if (entrou) mainFrame.trocarTela("telaApostas");
         }
     }
 
@@ -111,27 +111,62 @@ public class TelaLogin extends JPanel {
      * (evita falso negativo por comparação de referência de objeto).
      * Só oferece escolha de grupo se ainda não pertencer a nenhum.
      */
-    private void escolherGrupoSeNecessario(Participante participante) {
+    private boolean escolherGrupoSeNecessario(Participante participante) {
         List<Grupo> grupos = mainFrame.getGrupoController().getGrupos();
-        if (grupos == null || grupos.isEmpty()) return;
+        if (grupos == null || grupos.isEmpty()) return true; // sem grupos cadastrados, libera
 
-        // Compara por ID, não por referência
-        for (Grupo g : grupos) {
-            for (Participante p : g.getParticipantes()) {
-                if (p.getId() == participante.getId()) return; // já está em um grupo
-            }
+        // Verifica se já está em algum grupo pelo ID
+        for (Grupo g : grupos)
+            for (Participante p : g.getParticipantes())
+                if (p.getId() == participante.getId()) return true;
+
+        // Filtra grupos com vaga
+        List<Grupo> gruposComVaga = new java.util.ArrayList<>();
+        for (Grupo g : grupos)
+            if (g.getParticipantes().size() < 5) gruposComVaga.add(g);
+
+        if (gruposComVaga.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Todos os grupos estão cheios! Entre em contato com o administrador.");
+            mainFrame.setParticipanteLogado(null);
+            return false;
         }
 
-        String[] nomes = new String[grupos.size()];
-        for (int i = 0; i < grupos.size(); i++) nomes[i] = grupos.get(i).getNome();
+        // Loop até escolher um grupo ou cancelar
+        while (true) {
+            String[] nomes = new String[gruposComVaga.size()];
+            for (int i = 0; i < gruposComVaga.size(); i++)
+                nomes[i] = gruposComVaga.get(i).getNome()
+                        + " (" + gruposComVaga.get(i).getParticipantes().size() + "/5)";
 
-        String escolhido = (String) JOptionPane.showInputDialog(
-                this, "Escolha um grupo:", "Grupo",
-                JOptionPane.PLAIN_MESSAGE, null, nomes, nomes[0]);
+            String escolhido = (String) JOptionPane.showInputDialog(
+                    this, "Você precisa escolher um grupo para continuar:",
+                    "Escolha seu grupo",
+                    JOptionPane.PLAIN_MESSAGE, null, nomes, nomes[0]);
 
-        if (escolhido != null) {
-            Grupo grupo = mainFrame.getGrupoController().buscarNome(escolhido);
-            mainFrame.getGrupoController().addParticipante(grupo, participante);
+            if (escolhido == null) {
+                JOptionPane.showMessageDialog(this,
+                        "Você precisa entrar em um grupo para usar o sistema.");
+                mainFrame.setParticipanteLogado(null);
+                return false; // bloqueia o acesso
+            }
+
+            String nomeGrupo = escolhido.substring(0, escolhido.indexOf(" (")).trim();
+            Grupo grupo = mainFrame.getGrupoController().buscarNome(nomeGrupo);
+            boolean ok = mainFrame.getGrupoController().addParticipante(grupo, participante);
+
+            if (ok) return true;
+
+            JOptionPane.showMessageDialog(this, "Grupo cheio! Escolha outro.");
+            gruposComVaga.clear();
+            for (Grupo g : mainFrame.getGrupoController().getGrupos())
+                if (g.getParticipantes().size() < 5) gruposComVaga.add(g);
+
+            if (gruposComVaga.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Todos os grupos estão cheios!");
+                mainFrame.setParticipanteLogado(null);
+                return false;
+            }
         }
     }
 }
