@@ -6,6 +6,7 @@ import Controller.PartidaController;
 import Model.Campeonato;
 import Model.Clube;
 import Model.Partida;
+
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
@@ -21,6 +22,15 @@ public class TelaCadastro extends JPanel {
     private JPanel               painelForm;
     private CardLayout           cardForm;
 
+    // Combos que precisam ser recarregados ao abrir cada painel
+    private JComboBox<String> comboCampAssociar;
+    private JComboBox<String> comboClubeAssociar;
+    private JComboBox<String> comboCampPartida;
+    private JComboBox<String> comboMandante;
+    private JComboBox<String> comboVisitante;
+    private JComboBox<String> comboCampResultado;
+    private JComboBox<String> comboPartidaResultado;
+
     public TelaCadastro(MainFrame main, CampeonatoController campeonatoController,
                         PartidaController partidaController) {
         this.main                 = main;
@@ -30,24 +40,33 @@ public class TelaCadastro extends JPanel {
 
         setLayout(new BorderLayout());
 
-        // Menu lateral
         JPanel menu = new JPanel(new GridLayout(7, 1, 5, 5));
         menu.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
         menu.setPreferredSize(new Dimension(160, 0));
 
-        String[] botoes = {"Campeonato", "Clube", "Associar Clube", "Partida", "Resultado", "Grupo", "Sair"};
-        String[] paineis = {"campeonato", "clube", "associar", "partida", "resultado", "grupo", null};
+        JButton btnCampeonato = new JButton("Campeonato");
+        JButton btnClube      = new JButton("Clube");
+        JButton btnAssociar   = new JButton("Associar Clube");
+        JButton btnPartida    = new JButton("Partida");
+        JButton btnResultado  = new JButton("Resultado");
+        JButton btnGrupo      = new JButton("Grupo");
+        JButton btnSair       = new JButton("Sair");
 
-        for (int i = 0; i < botoes.length; i++) {
-            JButton b = new JButton(botoes[i]);
-            final String painel = paineis[i];
-            if (painel == null) {
-                b.addActionListener(e -> main.trocarTela("telaLogin"));
-            } else {
-                b.addActionListener(e -> mostrar(painel));
-            }
-            menu.add(b);
-        }
+        btnCampeonato.addActionListener(e -> mostrar("campeonato"));
+        btnClube     .addActionListener(e -> mostrar("clube"));
+        btnAssociar  .addActionListener(e -> { recarregarAssociar();   mostrar("associar");   });
+        btnPartida   .addActionListener(e -> { recarregarPartida();    mostrar("partida");    });
+        btnResultado .addActionListener(e -> { recarregarResultado();  mostrar("resultado");  });
+        btnGrupo     .addActionListener(e -> mostrar("grupo"));
+        btnSair      .addActionListener(e -> main.trocarTela("telaLogin"));
+
+        menu.add(btnCampeonato);
+        menu.add(btnClube);
+        menu.add(btnAssociar);
+        menu.add(btnPartida);
+        menu.add(btnResultado);
+        menu.add(btnGrupo);
+        menu.add(btnSair);
 
         cardForm   = new CardLayout();
         painelForm = new JPanel(cardForm);
@@ -75,7 +94,8 @@ public class TelaCadastro extends JPanel {
         JButton criar = new JButton("Criar Campeonato");
         criar.addActionListener(e -> {
             try {
-                boolean ok = campeonatoController.novoCampeonato(nome.getText(), Integer.parseInt(ano.getText()));
+                boolean ok = campeonatoController.novoCampeonato(
+                        nome.getText(), Integer.parseInt(ano.getText()));
                 msg(ok ? "Campeonato criado!" : "Dados inválidos.");
                 if (ok) { nome.setText(""); ano.setText(""); }
             } catch (NumberFormatException ex) { msg("Ano inválido."); }
@@ -84,7 +104,7 @@ public class TelaCadastro extends JPanel {
         return p;
     }
 
-    // ── Clube — só cadastra, sem associar ─────────────────────────────────────
+    // ── Clube ─────────────────────────────────────────────────────────────────
 
     private JPanel painelClube() {
         JPanel p = form();
@@ -95,7 +115,8 @@ public class TelaCadastro extends JPanel {
         JButton cadastrar = new JButton("Cadastrar Clube");
         cadastrar.addActionListener(e -> {
             boolean ok = campeonatoController.cadastrarClube(nome.getText(), sigla.getText());
-            msg(ok ? "Clube cadastrado! Use 'Associar Clube' para adicioná-lo a um campeonato." : "Dados inválidos.");
+            msg(ok ? "Clube cadastrado! Use 'Associar Clube' para adicioná-lo a um campeonato."
+                    : "Dados inválidos.");
             if (ok) { nome.setText(""); sigla.setText(""); }
         });
         p.add(cadastrar);
@@ -107,45 +128,28 @@ public class TelaCadastro extends JPanel {
     private JPanel painelAssociar() {
         JPanel p = form();
 
-        JComboBox<String> comboCamp  = new JComboBox<>();
-        JComboBox<String> comboClube = new JComboBox<>();
-
-        // Botão para recarregar listas do banco
-        JButton recarregar = new JButton("Recarregar listas");
-        recarregar.addActionListener(e -> {
-            comboCamp.removeAllItems();
-            comboClube.removeAllItems();
-            for (Campeonato c : campeonatoController.getCampeonatos())
-                comboCamp.addItem(c.getNome());
-            for (Clube c : campeonatoController.getClubes())
-                comboClube.addItem(c.getNome() + " (" + c.getSigla() + ")");
-        });
-
-        // Carrega automaticamente ao montar o painel
-        for (Campeonato c : campeonatoController.getCampeonatos())
-            comboCamp.addItem(c.getNome());
-        for (Clube c : campeonatoController.getClubes())
-            comboClube.addItem(c.getNome() + " (" + c.getSigla() + ")");
+        comboCampAssociar  = new JComboBox<>();
+        comboClubeAssociar = new JComboBox<>();
 
         JButton associar = new JButton("Associar ao Campeonato");
         associar.addActionListener(e -> {
-            Campeonato camp = campeonatoController.procurarCampeonato((String) comboCamp.getSelectedItem());
+            Campeonato camp = campeonatoController.procurarCampeonato(
+                    (String) comboCampAssociar.getSelectedItem());
             if (camp == null) { msg("Selecione um campeonato!"); return; }
 
-            String itemClube = (String) comboClube.getSelectedItem();
+            String itemClube = (String) comboClubeAssociar.getSelectedItem();
             if (itemClube == null) { msg("Selecione um clube!"); return; }
 
-            // Extrai a sigla do item "Nome (SIGLA)"
             String sigla = itemClube.substring(itemClube.indexOf("(") + 1, itemClube.indexOf(")"));
-            Clube clube = campeonatoController.procurarClube(sigla);
+            Clube clube = campeonatoController.procurarClube(sigla.trim());
 
             boolean ok = campeonatoController.addClube(camp, clube);
-            msg(ok ? "Clube associado ao campeonato!" : "Clube já está no campeonato ou limite de 8 atingido!");
+            msg(ok ? "Clube associado ao campeonato!"
+                    : "Clube já está no campeonato ou limite de 8 atingido!");
         });
 
-        p.add(new JLabel("Campeonato:")); p.add(comboCamp);
-        p.add(new JLabel("Clube:"));      p.add(comboClube);
-        p.add(recarregar);
+        p.add(new JLabel("Campeonato:")); p.add(comboCampAssociar);
+        p.add(new JLabel("Clube:"));      p.add(comboClubeAssociar);
         p.add(associar);
         return p;
     }
@@ -155,30 +159,12 @@ public class TelaCadastro extends JPanel {
     private JPanel painelPartida() {
         JPanel p = form();
 
-        JComboBox<String> comboCamp   = new JComboBox<>();
-        JComboBox<String> mandante    = new JComboBox<>();
-        JComboBox<String> visitante   = new JComboBox<>();
+        comboCampPartida = new JComboBox<>();
+        comboMandante    = new JComboBox<>();
+        comboVisitante   = new JComboBox<>();
 
-        // Carrega campeonatos
-        for (Campeonato c : campeonatoController.getCampeonatos())
-            comboCamp.addItem(c.getNome());
+        comboCampPartida.addActionListener(e -> carregarClubesDoCampeonato());
 
-        // Ao trocar campeonato, carrega só os clubes desse campeonato
-        comboCamp.addActionListener(e -> {
-            mandante.removeAllItems();
-            visitante.removeAllItems();
-            Campeonato camp = campeonatoController.procurarCampeonato((String) comboCamp.getSelectedItem());
-            if (camp == null) return;
-            for (Clube c : camp.getClubes()) {
-                mandante.addItem(c.getNome());
-                visitante.addItem(c.getNome());
-            }
-        });
-
-        // Dispara o evento para carregar os clubes do primeiro campeonato
-        if (comboCamp.getItemCount() > 0) comboCamp.setSelectedIndex(0);
-
-        // Seletores de data e hora
         SpinnerDateModel modeloData = new SpinnerDateModel();
         JSpinner spinnerData = new JSpinner(modeloData);
         spinnerData.setEditor(new JSpinner.DateEditor(spinnerData, "dd/MM/yyyy"));
@@ -187,24 +173,24 @@ public class TelaCadastro extends JPanel {
         JSpinner spinnerHora = new JSpinner(modeloHora);
         spinnerHora.setEditor(new JSpinner.DateEditor(spinnerHora, "HH:mm"));
 
-        p.add(new JLabel("Campeonato:")); p.add(comboCamp);
-        p.add(new JLabel("Casa:"));       p.add(mandante);
-        p.add(new JLabel("Visitante:"));  p.add(visitante);
+        p.add(new JLabel("Campeonato:")); p.add(comboCampPartida);
+        p.add(new JLabel("Casa:"));       p.add(comboMandante);
+        p.add(new JLabel("Visitante:"));  p.add(comboVisitante);
         p.add(new JLabel("Data:"));       p.add(spinnerData);
         p.add(new JLabel("Hora:"));       p.add(spinnerHora);
 
         JButton cadastrar = new JButton("Cadastrar Partida");
         cadastrar.addActionListener(e -> {
             try {
-                Campeonato camp = campeonatoController.procurarCampeonato((String) comboCamp.getSelectedItem());
-                Clube casa = buscarClubePorNome((String) mandante.getSelectedItem());
-                Clube vis  = buscarClubePorNome((String) visitante.getSelectedItem());
+                Campeonato camp = campeonatoController.procurarCampeonato(
+                        (String) comboCampPartida.getSelectedItem());
+                Clube casa = buscarClubeNoCampeonato(camp, (String) comboMandante.getSelectedItem());
+                Clube vis  = buscarClubeNoCampeonato(camp, (String) comboVisitante.getSelectedItem());
 
                 if (camp == null) { msg("Selecione um campeonato!"); return; }
                 if (casa == null || vis == null) { msg("Selecione os times!"); return; }
                 if (casa.equals(vis)) { msg("Selecione times diferentes!"); return; }
 
-                // Converte data do spinner
                 java.util.Date dateData = (java.util.Date) spinnerData.getValue();
                 java.util.Calendar cal = java.util.Calendar.getInstance();
                 cal.setTime(dateData);
@@ -213,7 +199,6 @@ public class TelaCadastro extends JPanel {
                         cal.get(java.util.Calendar.MONTH) + 1,
                         cal.get(java.util.Calendar.DAY_OF_MONTH));
 
-                // Converte hora do spinner
                 java.util.Date dateHora = (java.util.Date) spinnerHora.getValue();
                 cal.setTime(dateHora);
                 LocalTime hora = LocalTime.of(
@@ -221,7 +206,8 @@ public class TelaCadastro extends JPanel {
                         cal.get(java.util.Calendar.MINUTE));
 
                 boolean ok = partidaController.cadastrarPartida(camp, casa, vis, data, hora);
-                msg(ok ? "Partida cadastrada!" : "Erro ao cadastrar. Verifique se os clubes pertencem ao campeonato.");
+                msg(ok ? "Partida cadastrada!"
+                        : "Erro: verifique se os clubes pertencem ao campeonato.");
             } catch (Exception ex) {
                 msg("Erro: " + ex.getMessage());
             }
@@ -235,41 +221,31 @@ public class TelaCadastro extends JPanel {
     private JPanel painelResultado() {
         JPanel p = form();
 
-        JComboBox<String> comboCamp    = new JComboBox<>();
-        JComboBox<String> comboPartida = new JComboBox<>();
+        comboCampResultado    = new JComboBox<>();
+        comboPartidaResultado = new JComboBox<>();
 
-        for (Campeonato c : campeonatoController.getCampeonatos())
-            comboCamp.addItem(c.getNome());
-
-        comboCamp.addActionListener(e -> {
-            comboPartida.removeAllItems();
-            Campeonato c = campeonatoController.procurarCampeonato((String) comboCamp.getSelectedItem());
-            if (c == null) return;
-            for (Partida pt : c.getPartidas())
-                if (!pt.isPartidaFinalizada())
-                    comboPartida.addItem(pt.getClubeCasa().getNome() + " x " + pt.getClubeVisitante().getNome());
-        });
+        comboCampResultado.addActionListener(e -> carregarPartidasPendentes());
 
         JTextField golsCasa = new JTextField();
         JTextField golsVis  = new JTextField();
 
-        p.add(new JLabel("Campeonato:")); p.add(comboCamp);
-        p.add(new JLabel("Partida:"));    p.add(comboPartida);
-        p.add(new JLabel("Gols casa:"));  p.add(golsCasa);
-        p.add(new JLabel("Gols visitante:")); p.add(golsVis);
+        p.add(new JLabel("Campeonato:"));     p.add(comboCampResultado);
+        p.add(new JLabel("Partida:"));         p.add(comboPartidaResultado);
+        p.add(new JLabel("Gols casa:"));       p.add(golsCasa);
+        p.add(new JLabel("Gols visitante:"));  p.add(golsVis);
 
         JButton salvar = new JButton("Salvar Resultado");
         salvar.addActionListener(e -> {
             try {
-                Campeonato camp = campeonatoController.procurarCampeonato((String) comboCamp.getSelectedItem());
-                if (camp == null) return;
+                Campeonato camp = campeonatoController.procurarCampeonato(
+                        (String) comboCampResultado.getSelectedItem());
+                if (camp == null) { msg("Selecione um campeonato!"); return; }
 
-                // Busca a partida pelo índice selecionado
                 List<Partida> pendentes = new java.util.ArrayList<>();
                 for (Partida pt : camp.getPartidas())
                     if (!pt.isPartidaFinalizada()) pendentes.add(pt);
 
-                int idx = comboPartida.getSelectedIndex();
+                int idx = comboPartidaResultado.getSelectedIndex();
                 if (idx < 0 || idx >= pendentes.size()) { msg("Selecione uma partida!"); return; }
 
                 boolean ok = partidaController.addResultado(
@@ -279,13 +255,7 @@ public class TelaCadastro extends JPanel {
 
                 msg(ok ? "Resultado salvo!" : "Erro ao salvar.");
                 if (ok) {
-                    // Calcula pontuações das apostas dessa partida
-                    main.getApostaController().CalcularPontos(camp);
-                    // Recarrega partidas pendentes
-                    comboPartida.removeAllItems();
-                    for (Partida pt : camp.getPartidas())
-                        if (!pt.isPartidaFinalizada())
-                            comboPartida.addItem(pt.getClubeCasa().getNome() + " x " + pt.getClubeVisitante().getNome());
+                    carregarPartidasPendentes();
                     golsCasa.setText(""); golsVis.setText("");
                 }
             } catch (NumberFormatException ex) {
@@ -312,6 +282,54 @@ public class TelaCadastro extends JPanel {
         return p;
     }
 
+    // ── Métodos de recarga ────────────────────────────────────────────────────
+
+    private void recarregarAssociar() {
+        comboCampAssociar.removeAllItems();
+        comboClubeAssociar.removeAllItems();
+        for (Campeonato c : campeonatoController.getCampeonatos())
+            comboCampAssociar.addItem(c.getNome());
+        for (Clube c : campeonatoController.getClubes())
+            comboClubeAssociar.addItem(c.getNome() + " (" + c.getSigla() + ")");
+    }
+
+    private void recarregarPartida() {
+        comboCampPartida.removeAllItems();
+        for (Campeonato c : campeonatoController.getCampeonatos())
+            comboCampPartida.addItem(c.getNome());
+        // listener do combo dispara carregarClubesDoCampeonato automaticamente
+    }
+
+    private void recarregarResultado() {
+        comboCampResultado.removeAllItems();
+        for (Campeonato c : campeonatoController.getCampeonatos())
+            comboCampResultado.addItem(c.getNome());
+        // listener do combo dispara carregarPartidasPendentes automaticamente
+    }
+
+    private void carregarClubesDoCampeonato() {
+        comboMandante.removeAllItems();
+        comboVisitante.removeAllItems();
+        Campeonato camp = campeonatoController.procurarCampeonato(
+                (String) comboCampPartida.getSelectedItem());
+        if (camp == null) return;
+        for (Clube c : camp.getClubes()) {
+            comboMandante.addItem(c.getNome());
+            comboVisitante.addItem(c.getNome());
+        }
+    }
+
+    private void carregarPartidasPendentes() {
+        comboPartidaResultado.removeAllItems();
+        Campeonato camp = campeonatoController.procurarCampeonato(
+                (String) comboCampResultado.getSelectedItem());
+        if (camp == null) return;
+        for (Partida pt : camp.getPartidas())
+            if (!pt.isPartidaFinalizada())
+                comboPartidaResultado.addItem(
+                        pt.getClubeCasa().getNome() + " x " + pt.getClubeVisitante().getNome());
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private JPanel form() {
@@ -320,8 +338,13 @@ public class TelaCadastro extends JPanel {
         return p;
     }
 
-    private void msg(String texto) {
-        JOptionPane.showMessageDialog(this, texto);
+    private void msg(String texto) { JOptionPane.showMessageDialog(this, texto); }
+
+    private Clube buscarClubeNoCampeonato(Campeonato camp, String nome) {
+        if (camp == null || nome == null) return null;
+        for (Clube c : camp.getClubes())
+            if (c.getNome().equals(nome)) return c;
+        return null;
     }
 
     private Clube buscarClubePorNome(String nome) {
