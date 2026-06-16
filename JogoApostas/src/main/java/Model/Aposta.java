@@ -6,22 +6,19 @@ import jakarta.persistence.*;
 @Table(name = "apostas")
 public class Aposta implements ICalcularPontos{
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //banco gera autoático
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idAposta;
 
-    // Muitas apostas pertencem a um participante
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participante_id", nullable = false)
     private Participante participante;
 
-    // Muitas apostas pertencem a uma partida
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partida_id", nullable = false)
     private Partida partida;
 
     @Column(name = "gols_mandante_palpite", nullable = false)
     private int palpiteGolsCasa;
-
 
     @Column(name = "gols_visitante_palpite", nullable = false)
     private int palpiteGolsVsitante;
@@ -32,12 +29,10 @@ public class Aposta implements ICalcularPontos{
     @Column(name = "pontuacao_obtida")
     private int pontosObtidos;
 
-
     public Aposta(){
     }
 
-    public Aposta(int idAposta, Participante participante, Partida partida, int palpiteGolsCasa, int palpiteGolsVsitante) {
-        this.idAposta = idAposta;
+    public Aposta(Participante participante, Partida partida, int palpiteGolsCasa, int palpiteGolsVsitante) {
         this.participante = participante;
         this.partida = partida;
         this.palpiteGolsCasa = palpiteGolsCasa;
@@ -90,10 +85,6 @@ public class Aposta implements ICalcularPontos{
 
     public int getIdAposta(){
         return idAposta;
-    }
-
-    public void setIdAposta(int idAposta){
-        this.idAposta = idAposta;
     }
 
     public Participante getParticipante(){
