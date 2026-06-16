@@ -40,7 +40,7 @@ public class ApostaController {
             return false;
 
         // Verifica duplicata — mesmo participante na mesma partida
-        for (Aposta a : apostaRepository.buscarPorParticipante(participante)) {
+        for (Aposta a : apostaRepository.buscarParticipante(participante)) {
             if (a.getPartida() == partida)
                 return false;
         }
@@ -65,7 +65,7 @@ public class ApostaController {
 
     public int getTotalPontosPorParticipante(Participante participante) {
         int total = 0;
-        for (Aposta a : apostaRepository.buscarPorParticipante(participante)) {
+        for (Aposta a : apostaRepository.buscarParticipante(participante)) {
             total += a.getPontosObtidos();
         }
         return total;
@@ -73,7 +73,7 @@ public class ApostaController {
 
     // Retorna todas as apostas de um participante
     public List<Aposta> getApostasPorParticipante(Participante participante) {
-        return apostaRepository.buscarPorParticipante(participante);
+        return apostaRepository.buscarParticipante(participante);
     }
 
     // Retorna todas as apostas

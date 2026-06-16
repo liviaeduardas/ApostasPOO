@@ -58,7 +58,7 @@ public class PartidaController {
 
         // 2. Busca apostas desta partida pelo ID — sem acessar lazy
         try {
-            List<Aposta> apostas = apostaRepository.buscarPorPartida(partida.getId());
+            List<Aposta> apostas = apostaRepository.buscarPartida(partida.getId());
             for (Aposta a : apostas) {
                 // Injeta os gols reais no palpite para calcular corretamente
                 a.getPartida().resultadoFinal(golsCasa, golsVisitante);
