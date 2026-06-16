@@ -1,31 +1,22 @@
 package Model;
 import jakarta.persistence.*;
 
-/**
- * @Entity — diz ao Hibernate que essa classe vira uma tabela no banco
- * @Table  — define o nome da tabela no banco
- */
-
 @Entity
 @Table(name = "clubes")
+
 public class Clube {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // faz o banco gerar id automático
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // nullable não pode ser nulo | length é o tamanho máximo do texto
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    public int getId() {
+    public int getId(){
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    @Column(name = "sigla", nullable = false, length = 100)
+    @Column(name = "sigla", nullable = false, length = 5)
     private String sigla;
 
     public Clube(String nome, String sigla) {
@@ -33,7 +24,7 @@ public class Clube {
         this.sigla = sigla;
     }
 
-    public Clube() {
+    public Clube(){
     }
 
     public String getNome(){
@@ -51,5 +42,4 @@ public class Clube {
     public void setSigla(String sigla){
         this.sigla = sigla;
     }
-
 }

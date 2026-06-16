@@ -5,36 +5,31 @@ import java.util.List;
 
 @Entity
 @Table(name = "grupos")
+
 public class Grupo {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // banco gera id automático
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    // Um grupo tem vários participantes e um participante pode estar em vários grupos
-    @ManyToMany(fetch = FetchType.EAGER) // grupos são carregadas do banco so quando chamar
-    @JoinTable(
-            name = "grupo_participantes",                        // nome da tabela intermediária
-            joinColumns = @JoinColumn(name = "grupo_id"),        // chave do grupo
-            inverseJoinColumns = @JoinColumn(name = "participante_id") // chave do participante
-    )
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "grupo_participantes", joinColumns = @JoinColumn(name = "grupo_id"), inverseJoinColumns = @JoinColumn(name = "participante_id"))
     private List<Participante> participantes;
 
     public Grupo(){
-        this.participantes = new ArrayList();
+        this.participantes = new ArrayList<>();
     }
 
-    public Grupo(int id, String nome) {
-        this.id = id;
+    public Grupo(String nome) {
         this.nome = nome;
-        this.participantes = new ArrayList();
+        this.participantes = new ArrayList<>();
     }
 
     public boolean addParticipante(Participante participante){
         if(participantes.size() >= 5){
-            System.out.println("Grupo está CHEIO!");
+            System.out.println("Grupo está cheio");
             return false;
         }
         else{
@@ -53,10 +48,6 @@ public class Grupo {
 
     public int getId(){
         return id;
-    }
-
-    public void setId(int id){
-        this.id = id;
     }
 
     public String getNome(){

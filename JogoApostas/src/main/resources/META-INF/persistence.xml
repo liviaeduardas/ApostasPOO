@@ -19,7 +19,6 @@
         <class>Model.Clube</class>
         <class>Model.Campeonato</class>
         <class>Model.Partida</class>
-        <class>Model.PartidaRegular</class>
         <class>Model.Aposta</class>
         <class>Model.Grupo</class>
 
