@@ -73,7 +73,7 @@ public class TelaLogin extends JPanel {
         if (u instanceof Participante) {
             Participante participante = (Participante) u;
             mainFrame.setParticipanteLogado(participante);
-            boolean entrou = escolherGrupoSeNecessario(participante);
+            boolean entrou = escolherGrupo(participante);
             if (entrou) mainFrame.trocarTela("telaApostas");
         }
     }
@@ -111,28 +111,35 @@ public class TelaLogin extends JPanel {
      * (evita falso negativo por comparação de referência de objeto).
      * Só oferece escolha de grupo se ainda não pertencer a nenhum.
      */
-    private boolean escolherGrupoSeNecessario(Participante participante) {
+    private boolean escolherGrupo(Participante participante) {
         List<Grupo> grupos = mainFrame.getGrupoController().getGrupos();
-        if (grupos == null || grupos.isEmpty()) return true; // sem grupos cadastrados, libera
+        if (grupos == null || grupos.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Nenhum grupo disponível. Aguarde o administrador criar um grupo.");
+            mainFrame.setParticipanteLogado(null);
+            return false;
+        }
 
-        // Verifica se já está em algum grupo pelo ID
-        for (Grupo g : grupos)
-            for (Participante p : g.getParticipantes())
-                if (p.getId() == participante.getId()) return true;
+        // Busca cada grupo fresco do banco para verificar participantes atualizados
+        for (Grupo g : grupos) {
+            Grupo grupoAtualizado = mainFrame.getGrupoController().buscarNome(g.getNome());
+            if (grupoAtualizado == null) continue;
+            for (Participante p : grupoAtualizado.getParticipantes())
+                if (p.getId() == participante.getId()) return true; // já está em um grupo
+        }
 
-        // Filtra grupos com vaga
+        // Não está em nenhum grupo — filtra grupos com vaga
         List<Grupo> gruposComVaga = new java.util.ArrayList<>();
         for (Grupo g : grupos)
             if (g.getParticipantes().size() < 5) gruposComVaga.add(g);
 
         if (gruposComVaga.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Todos os grupos estão cheios! Entre em contato com o administrador.");
+            JOptionPane.showMessageDialog(this, "Todos os grupos estão cheios!");
             mainFrame.setParticipanteLogado(null);
             return false;
         }
 
-        // Loop até escolher um grupo ou cancelar
+        // Pede para escolher um grupo
         while (true) {
             String[] nomes = new String[gruposComVaga.size()];
             for (int i = 0; i < gruposComVaga.size(); i++)
@@ -140,15 +147,14 @@ public class TelaLogin extends JPanel {
                         + " (" + gruposComVaga.get(i).getParticipantes().size() + "/5)";
 
             String escolhido = (String) JOptionPane.showInputDialog(
-                    this, "Você precisa escolher um grupo para continuar:",
+                    this, "Escolha um grupo para continuar:",
                     "Escolha seu grupo",
                     JOptionPane.PLAIN_MESSAGE, null, nomes, nomes[0]);
 
             if (escolhido == null) {
-                JOptionPane.showMessageDialog(this,
-                        "Você precisa entrar em um grupo para usar o sistema.");
+                JOptionPane.showMessageDialog(this, "Você precisa entrar em um grupo!");
                 mainFrame.setParticipanteLogado(null);
-                return false; // bloqueia o acesso
+                return false;
             }
 
             String nomeGrupo = escolhido.substring(0, escolhido.indexOf(" (")).trim();
@@ -157,6 +163,7 @@ public class TelaLogin extends JPanel {
 
             if (ok) return true;
 
+            // Grupo ficou cheio — atualiza lista
             JOptionPane.showMessageDialog(this, "Grupo cheio! Escolha outro.");
             gruposComVaga.clear();
             for (Grupo g : mainFrame.getGrupoController().getGrupos())
@@ -169,4 +176,4 @@ public class TelaLogin extends JPanel {
             }
         }
     }
-}
+    }

@@ -53,7 +53,7 @@ public class Campeonato {
         }
 
         for (Clube c : clubes) {
-            if (c == clube) {
+            if (c.getId() == clube.getId()) {
                 System.out.println("Clube já cadastrado no campeonato.");
                 return false;
             }
@@ -67,11 +67,11 @@ public class Campeonato {
         boolean VisitanteExiste = false;
 
         for (Clube clube : clubes) {
-            if (clube == partida.getClubeCasa()) {
+            if (clube.getId() == partida.getClubeCasa().getId()){
                 CasaExiste = true;
             }
 
-            if (clube == partida.getClubeVisitante()) {
+            if (clube.getId() == partida.getClubeVisitante().getId()) {
                 VisitanteExiste = true;
             }
         }

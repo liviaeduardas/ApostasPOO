@@ -17,6 +17,14 @@ public class Clube {
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Column(name = "sigla", nullable = false, length = 100)
     private String sigla;
 

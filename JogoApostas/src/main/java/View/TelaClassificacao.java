@@ -88,8 +88,22 @@ public class TelaClassificacao extends JPanel {
 
     public void atualizar() {
         comboGrupo.removeAllItems();
-        for (Grupo g : grupoController.getGrupos())
-            comboGrupo.addItem(g.getNome());
+
+        Participante participante = main.getParticipanteLogado();
+        if (participante == null) return;
+
+        // Mostra só os grupos que o participante pertence
+        for (Grupo g : grupoController.getGrupos()) {
+            Grupo grupoAtualizado = grupoController.buscarNome(g.getNome());
+            if (grupoAtualizado == null) continue;
+            for (Participante p : grupoAtualizado.getParticipantes()) {
+                if (p.getId() == participante.getId()) {
+                    comboGrupo.addItem(g.getNome());
+                    break;
+                }
+            }
+        }
+
         mostrarRanking();
     }
 }
