@@ -7,7 +7,7 @@ import java.util.List;
 @DiscriminatorValue("PARTICIPANTE")
 
 public class Participante extends Usuario{
-    @OneToMany(mappedBy = "participante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "participante", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Aposta> apostas;
 
     public Participante() {
