@@ -21,6 +21,8 @@ public class TelaApostas extends JPanel {
     private JLabel            labelVisitante;  // mostra nome do time visitante
     private JTextField        txtGolsCasa;
     private JTextField        txtGolsVisitante;
+    private JLabel labelData;
+    private JLabel labelHora;
 
     // Lista paralela ao comboPartida para recuperar o objeto Partida pelo índice
     private final List<Partida> partidasExibidas = new ArrayList<>();
@@ -50,8 +52,12 @@ public class TelaApostas extends JPanel {
         // Labels com nome dos times — atualizadas quando o usuário troca a partida
         labelMandante  = new JLabel("Time da casa: -");
         labelVisitante = new JLabel("Time visitante: -");
+        labelData      = new JLabel("Data: -");
+        labelHora      = new JLabel("Hora: -");
         add(labelMandante);
         add(labelVisitante);
+        add(labelData);
+        add(labelHora);
 
         // Campos de gols
         add(new JLabel("Gols casa:"));
@@ -85,10 +91,14 @@ public class TelaApostas extends JPanel {
         if (p == null) {
             labelMandante.setText("Time da casa: -");
             labelVisitante.setText("Time visitante: -");
+            labelData.setText("Data: -");
+            labelHora.setText("Hora: -");
             return;
         }
-        labelMandante.setText("Time da casa: " + p.getClubeCasa().getNome());
+        labelMandante.setText("Time da casa: "   + p.getClubeCasa().getNome());
         labelVisitante.setText("Time visitante: " + p.getClubeVisitante().getNome());
+        labelData.setText("Data: "  + p.getDataPartida().toString());
+        labelHora.setText("Hora: "  + p.getHoraPartida().toString());
     }
 
     private void fazerAposta() {
@@ -130,6 +140,8 @@ public class TelaApostas extends JPanel {
         partidasExibidas.clear();
         labelMandante.setText("Time da casa: -");
         labelVisitante.setText("Time visitante: -");
+        labelData.setText("Data: -");      // adiciona essa linha
+        labelHora.setText("Hora: -");
 
         Campeonato campeonato = campeonatoController.procurarCampeonato(
                 (String) comboCampeonato.getSelectedItem());
