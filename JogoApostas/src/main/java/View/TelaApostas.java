@@ -11,55 +11,55 @@ import java.util.List;
 
 public class TelaApostas extends JPanel {
 
-    private MainFrame            main;
-    private ApostaController     apostaController;
+    private MainFrame main;
+    private ApostaController apostaController;
     private CampeonatoController campeonatoController;
 
     private JComboBox<String> comboCampeonato;
     private JComboBox<String> comboPartida;
-    private JLabel            labelMandante;   // mostra nome do time da casa
-    private JLabel            labelVisitante;  // mostra nome do time visitante
-    private JTextField        txtGolsCasa;
-    private JTextField        txtGolsVisitante;
+    private JLabel labelMandante;
+    private JLabel labelVisitante;
     private JLabel labelData;
     private JLabel labelHora;
+    private JTextField txtGolsCasa;
+    private JTextField txtGolsVisitante;
 
-    // Lista paralela ao comboPartida para recuperar o objeto Partida pelo índice
+
     private final List<Partida> partidasExibidas = new ArrayList<>();
 
     public TelaApostas(MainFrame main, ApostaController apostaController,
                        CampeonatoController campeonatoController,
                        GrupoController grupoController) {
-        this.main                 = main;
-        this.apostaController     = apostaController;
+        this.main = main;
+        this.apostaController = apostaController;
         this.campeonatoController = campeonatoController;
 
         setLayout(new GridLayout(0, 1, 5, 5));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Campeonato
+
         add(new JLabel("Campeonato:"));
         comboCampeonato = new JComboBox<>();
         comboCampeonato.addActionListener(e -> carregarPartidas());
         add(comboCampeonato);
 
-        // Partida
+
         add(new JLabel("Partida:"));
         comboPartida = new JComboBox<>();
-        comboPartida.addActionListener(e -> atualizarNomeTimes()); // atualiza labels ao trocar partida
+        comboPartida.addActionListener(e -> atualizarNomeTimes());
         add(comboPartida);
 
-        // Labels com nome dos times — atualizadas quando o usuário troca a partida
-        labelMandante  = new JLabel("Time da casa: -");
+
+        labelMandante = new JLabel("Time da casa: -");
         labelVisitante = new JLabel("Time visitante: -");
-        labelData      = new JLabel("Data: -");
-        labelHora      = new JLabel("Hora: -");
+        labelData = new JLabel("Data: -");
+        labelHora = new JLabel("Hora: -");
         add(labelMandante);
         add(labelVisitante);
         add(labelData);
         add(labelHora);
 
-        // Campos de gols
+
         add(new JLabel("Gols casa:"));
         txtGolsCasa = new JTextField();
         add(txtGolsCasa);
@@ -85,51 +85,56 @@ public class TelaApostas extends JPanel {
         add(sair);
     }
 
-    // Atualiza os labels com o nome dos times da partida selecionada
+
     private void atualizarNomeTimes() {
-        Partida p = getPartidaSelecionada();
-        if (p == null) {
+        Partida partida = getPartidaSelecionada();
+
+        if (partida == null) {
             labelMandante.setText("Time da casa: -");
             labelVisitante.setText("Time visitante: -");
             labelData.setText("Data: -");
             labelHora.setText("Hora: -");
             return;
         }
-        labelMandante.setText("Time da casa: "   + p.getClubeCasa().getNome());
-        labelVisitante.setText("Time visitante: " + p.getClubeVisitante().getNome());
-        labelData.setText("Data: "  + p.getDataPartida().toString());
-        labelHora.setText("Hora: "  + p.getHoraPartida().toString());
+
+        labelMandante.setText("Time da casa: " + partida.getClubeCasa().getNome());
+        labelVisitante.setText("Time visitante: " + partida.getClubeVisitante().getNome());
+        labelData.setText("Data: " + partida.getDataPartida());
+        labelHora.setText("Hora: " + partida.getHoraPartida());
     }
 
     private void fazerAposta() {
+        Participante participante = main.getParticipanteLogado();
+        if (participante == null) {
+            JOptionPane.showMessageDialog(this, "Nenhum participante logado.");
+            return;
+        }
+
+        Partida partida = getPartidaSelecionada();
+        if (partida == null) {
+            JOptionPane.showMessageDialog(this, "Selecione uma partida.");
+            return;
+        }
+
+        if (txtGolsCasa.getText().trim().isEmpty() || txtGolsVisitante.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Preencha os gols!");
+            return;
+        }
+
         try {
-            Participante participante = main.getParticipanteLogado();
-            if (participante == null) {
-                JOptionPane.showMessageDialog(this, "Nenhum participante logado.");
-                return;
-            }
-
-            Partida partida = getPartidaSelecionada();
-            if (partida == null) {
-                JOptionPane.showMessageDialog(this, "Selecione uma partida.");
-                return;
-            }
-
-            if (txtGolsCasa.getText().trim().isEmpty() || txtGolsVisitante.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Preencha os gols!");
-                return;
-            }
-
-            int golsCasa      = Integer.parseInt(txtGolsCasa.getText().trim());
+            int golsCasa = Integer.parseInt(txtGolsCasa.getText().trim());
             int golsVisitante = Integer.parseInt(txtGolsVisitante.getText().trim());
 
             boolean ok = apostaController.FazerAposta(participante, partida, golsCasa, golsVisitante);
-            JOptionPane.showMessageDialog(this, ok
-                    ? "Aposta realizada!"
-                    : "Não foi possível apostar.\nVerifique se já apostou nessa partida ou se o prazo encerrou.");
 
-            if (ok) { txtGolsCasa.setText(""); txtGolsVisitante.setText(""); }
-
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Aposta realizada!");
+                txtGolsCasa.setText("");
+                txtGolsVisitante.setText("");
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Não foi possível apostar.\nVerifique se já apostou nessa partida ou se o prazo encerrou.");
+            }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Digite valores numéricos para os gols.");
         }
@@ -138,13 +143,11 @@ public class TelaApostas extends JPanel {
     private void carregarPartidas() {
         comboPartida.removeAllItems();
         partidasExibidas.clear();
-        labelMandante.setText("Time da casa: -");
-        labelVisitante.setText("Time visitante: -");
-        labelData.setText("Data: -");      // adiciona essa linha
-        labelHora.setText("Hora: -");
 
-        Campeonato campeonato = campeonatoController.procurarCampeonato(
-                (String) comboCampeonato.getSelectedItem());
+        String nomeCampeonato = (String) comboCampeonato.getSelectedItem();
+        if (nomeCampeonato == null) return;
+
+        Campeonato campeonato = campeonatoController.procurarCampeonato(nomeCampeonato);
         if (campeonato == null) return;
 
         for (Partida p : campeonato.getPartidas()) {
@@ -154,20 +157,26 @@ public class TelaApostas extends JPanel {
             }
         }
 
-        atualizarNomeTimes(); // atualiza labels com o primeiro item do combo
+        atualizarNomeTimes();
     }
 
+
     private Partida getPartidaSelecionada() {
-        int idx = comboPartida.getSelectedIndex();
-        if (idx < 0 || idx >= partidasExibidas.size()) return null;
-        return partidasExibidas.get(idx);
+        int indice = comboPartida.getSelectedIndex();
+        if (indice < 0 || indice >= partidasExibidas.size()) {
+            return null;
+        }
+        return partidasExibidas.get(indice);
     }
+
 
     public void atualizar() {
         comboCampeonato.removeAllItems();
         partidasExibidas.clear();
+
         for (Campeonato c : campeonatoController.getCampeonatos())
             comboCampeonato.addItem(c.getNome());
+
         carregarPartidas();
     }
 }

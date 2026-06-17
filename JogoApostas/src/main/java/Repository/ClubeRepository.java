@@ -5,9 +5,6 @@ import Util.JPAUtil;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 
-/**
- * Responsável por salvar e buscar Clubes no banco de dados.
- */
 public class ClubeRepository {
 
     public boolean salvarClube(Clube clube) {
@@ -18,7 +15,6 @@ public class ClubeRepository {
             entityManager.getTransaction().commit();
             return true;
         } catch (Exception e) {
-            entityManager.getTransaction().rollback();
             System.out.println("Erro ao salvar clube: " + e.getMessage());
             return false;
         } finally {
@@ -55,20 +51,22 @@ public class ClubeRepository {
     }
 
     public Clube buscarPorNome(String nome) {
-        EntityManager entityManager = JPAUtil.getEntityManager();
+        EntityManager em = JPAUtil.getEntityManager();
         try {
-            List<Clube> lista = entityManager.createQuery(
+            List<Clube> lista = em.createQuery(
                             "SELECT c FROM Clube c WHERE LOWER(c.nome) = LOWER(:n)", Clube.class)
-                    .setParameter("n", nome)
+                    .setParameter("n", nome.trim())
                     .getResultList();
-            entityManager.close();
-            return lista.isEmpty() ? null : lista.get(0);
+
+            if (lista.isEmpty()) {
+                return null;
+            }
+            return lista.get(0);
         } catch (Exception e) {
-            System.out.println("Erro ao buscar clubes: " + e.getMessage());
+            System.out.println("Erro ao buscar clube: " + e.getMessage());
             return null;
         } finally {
-            entityManager.close();
+            em.close();
         }
-
     }
 }
