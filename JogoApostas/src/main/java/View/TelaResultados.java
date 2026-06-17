@@ -10,13 +10,16 @@ import java.awt.*;
 
 public class TelaResultados extends JPanel {
 
-    private MainFrame            main;
+    private MainFrame main;
     private CampeonatoController campCtrl;
-    private JComboBox<String>    comboCamp;
-    private DefaultTableModel    modelo;
+    private JComboBox<String> comboCamp;
+    private DefaultTableModel modelo;
+
+
+    private static final String VAZIO = "";
 
     public TelaResultados(MainFrame main, CampeonatoController campCtrl) {
-        this.main     = main;
+        this.main = main;
         this.campCtrl = campCtrl;
 
         setLayout(new BorderLayout(5, 5));
@@ -47,8 +50,10 @@ public class TelaResultados extends JPanel {
     private void atualizarTabela() {
         modelo.setRowCount(0);
 
-        Campeonato campeonato = campCtrl.procurarCampeonato(
-                (String) comboCamp.getSelectedItem());
+        String nomeCamp = (String) comboCamp.getSelectedItem();
+        if (nomeCamp == null || nomeCamp.isEmpty()) return;
+
+        Campeonato campeonato = campCtrl.procurarCampeonato(nomeCamp);
         if (campeonato == null) return;
 
         boolean algumResultado = false;
@@ -56,9 +61,12 @@ public class TelaResultados extends JPanel {
             if (!p.isPartidaFinalizada()) continue;
 
             String resultado;
-            if      (p.getResultado() == 1) resultado = p.getClubeCasa().getNome() + " venceu";
-            else if (p.getResultado() == 2) resultado = p.getClubeVisitante().getNome() + " venceu";
-            else                             resultado = "Empate";
+            if (p.getResultado() == 1)
+                resultado = p.getClubeCasa().getNome() + " venceu";
+            else if (p.getResultado() == 2)
+                resultado = p.getClubeVisitante().getNome() + " venceu";
+            else
+                resultado = "Empate";
 
             modelo.addRow(new Object[]{
                     p.getClubeCasa().getNome(),
@@ -69,18 +77,17 @@ public class TelaResultados extends JPanel {
             algumResultado = true;
         }
 
-        if (!algumResultado)
+        if (!algumResultado) {
             modelo.addRow(new Object[]{"Nenhum resultado disponível.", "", "", ""});
+        }
     }
 
-    /**
-     * Chamado pelo MainFrame ao exibir esta tela.
-     * Recarrega campeonatos do banco; o listener do combo dispara atualizarTabela().
-     */
     public void atualizar() {
         comboCamp.removeAllItems();
+        comboCamp.addItem(VAZIO);
         for (Campeonato c : campCtrl.getCampeonatos())
             comboCamp.addItem(c.getNome());
-        // O listener do comboCamp já chama atualizarTabela() ao adicionar o primeiro item
+
+        modelo.setRowCount(0);
     }
 }

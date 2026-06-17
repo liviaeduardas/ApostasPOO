@@ -37,11 +37,11 @@ public class MainFrame extends JFrame {
         cardLayout = new CardLayout();
         painelPrincipal = new JPanel(cardLayout);
 
-        painelPrincipal.add(telaLogin,          "telaLogin");
-        painelPrincipal.add(telaCadastro,        "telaCadastro");
-        painelPrincipal.add(telaApostas,         "telaApostas");
-        painelPrincipal.add(telaResultados,      "telaResultados");
-        painelPrincipal.add(telaClassificacao,   "telaClassificacao");
+        painelPrincipal.add(telaLogin, "telaLogin");
+        painelPrincipal.add(telaCadastro, "telaCadastro");
+        painelPrincipal.add(telaApostas, "telaApostas");
+        painelPrincipal.add(telaResultados, "telaResultados");
+        painelPrincipal.add(telaClassificacao, "telaClassificacao");
 
         add(painelPrincipal);
 

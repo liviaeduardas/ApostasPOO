@@ -5,22 +5,23 @@ import Model.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TelaLogin extends JPanel {
-    private MainFrame         mainFrame;
+    private MainFrame mainFrame;
     private UsuarioController usuarioController;
-    private JTextField        campoUsuario;
-    private JPasswordField    campoSenha;
+    private JTextField campoUsuario;
+    private JPasswordField campoSenha;
 
     public TelaLogin(MainFrame mainFrame, UsuarioController usuarioController) {
-        this.mainFrame         = mainFrame;
+        this.mainFrame = mainFrame;
         this.usuarioController = usuarioController;
 
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(6, 6, 6, 6);
-        gbc.fill   = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titulo = new JLabel("Sistema de Apostas", SwingConstants.CENTER);
         titulo.setFont(new Font("SansSerif", Font.BOLD, 22));
@@ -29,7 +30,7 @@ public class TelaLogin extends JPanel {
         add(titulo, gbc);
 
         gbc.gridwidth = 1;
-        gbc.insets    = new Insets(4, 6, 4, 6);
+        gbc.insets  = new Insets(4, 6, 4, 6);
 
         gbc.gridx = 0; gbc.gridy = 1; add(new JLabel("Usuário:"), gbc);
         campoUsuario = new JTextField(18);
@@ -49,14 +50,14 @@ public class TelaLogin extends JPanel {
         gbc.gridy = 4;
         gbc.insets = new Insets(4, 40, 4, 40);
         add(cadastrar, gbc);
-        cadastrar.addActionListener(e -> cadastrarNovoUsuario());
+        cadastrar.addActionListener(e -> cadastrarUsuario());
 
         campoSenha.addActionListener(e -> login());
     }
 
     private void login() {
         String usuario = campoUsuario.getText().trim();
-        String senha   = new String(campoSenha.getPassword());
+        String senha = new String(campoSenha.getPassword());
         Usuario u = usuarioController.autenticar(usuario, senha);
 
         if (u == null) {
@@ -73,15 +74,18 @@ public class TelaLogin extends JPanel {
         if (u instanceof Participante) {
             Participante participante = (Participante) u;
             mainFrame.setParticipanteLogado(participante);
-            boolean entrou = escolherGrupo(participante);
-            if (entrou) mainFrame.trocarTela("telaApostas");
+
+            boolean entrouNoGrupo = participanteEntrouEmGrupo(participante);
+            if (entrouNoGrupo) {
+                mainFrame.trocarTela("telaApostas");
+            }
         }
     }
 
-    private void cadastrarNovoUsuario() {
-        JTextField     fNome    = new JTextField();
-        JTextField     fUsuario = new JTextField();
-        JPasswordField fSenha   = new JPasswordField();
+    private void cadastrarUsuario() {
+        JTextField fNome = new JTextField();
+        JTextField fUsuario = new JTextField();
+        JPasswordField fSenha = new JPasswordField();
 
         Object[] campos = { "Nome:", fNome, "Usuário:", fUsuario, "Senha:", fSenha };
 
@@ -106,32 +110,41 @@ public class TelaLogin extends JPanel {
         JOptionPane.showMessageDialog(this, "Cadastro realizado! Faça o login.");
     }
 
-    /**
-     * Verifica se o participante JÁ está em algum grupo comparando pelo ID
-     * (evita falso negativo por comparação de referência de objeto).
-     * Só oferece escolha de grupo se ainda não pertencer a nenhum.
-     */
-    private boolean escolherGrupo(Participante participante) {
-        List<Grupo> grupos = mainFrame.getGrupoController().getGrupos();
-        if (grupos == null || grupos.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Nenhum grupo disponível. Aguarde o administrador criar um grupo.");
-            mainFrame.setParticipanteLogado(null);
-            return false;
-        }
 
-        // Busca cada grupo fresco do banco para verificar participantes atualizados
-        for (Grupo g : grupos) {
-            Grupo grupoAtualizado = mainFrame.getGrupoController().buscarNome(g.getNome());
-            if (grupoAtualizado == null) continue;
-            for (Participante p : grupoAtualizado.getParticipantes())
-                if (p.getId() == participante.getId()) return true; // já está em um grupo
+    private boolean participanteEntrouEmGrupo(Participante participante) {
+        if (participanteEstaEmGrupo(participante)) {
+            return true;
         }
+        return escolheGrupo(participante);
 
-        // Não está em nenhum grupo — filtra grupos com vaga
-        List<Grupo> gruposComVaga = new java.util.ArrayList<>();
-        for (Grupo g : grupos)
-            if (g.getParticipantes().size() < 5) gruposComVaga.add(g);
+    }
+
+
+    private boolean participanteEstaEmGrupo(Participante participante) {
+        for (Grupo grupo : mainFrame.getGrupoController().getGrupos()) {
+            for (Participante p : grupo.getParticipantes()) {
+                if (p.getId() == participante.getId()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private List<Grupo> buscarGruposDisponiveis() {
+        List<Grupo> comVaga = new ArrayList<>();
+        for (Grupo g : mainFrame.getGrupoController().getGrupos()) {
+            if (g.getParticipantes().size() < 5) {
+                comVaga.add(g);
+            }
+        }
+        return comVaga;
+    }
+
+
+    private boolean escolheGrupo(Participante participante) {
+        List<Grupo> gruposComVaga = buscarGruposDisponiveis();
 
         if (gruposComVaga.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Todos os grupos estão cheios!");
@@ -139,41 +152,31 @@ public class TelaLogin extends JPanel {
             return false;
         }
 
-        // Pede para escolher um grupo
-        while (true) {
-            String[] nomes = new String[gruposComVaga.size()];
-            for (int i = 0; i < gruposComVaga.size(); i++)
-                nomes[i] = gruposComVaga.get(i).getNome()
-                        + " (" + gruposComVaga.get(i).getParticipantes().size() + "/5)";
-
-            String escolhido = (String) JOptionPane.showInputDialog(
-                    this, "Escolha um grupo para continuar:",
-                    "Escolha seu grupo",
-                    JOptionPane.PLAIN_MESSAGE, null, nomes, nomes[0]);
-
-            if (escolhido == null) {
-                JOptionPane.showMessageDialog(this, "Você precisa entrar em um grupo!");
-                mainFrame.setParticipanteLogado(null);
-                return false;
-            }
-
-            String nomeGrupo = escolhido.substring(0, escolhido.indexOf(" (")).trim();
-            Grupo grupo = mainFrame.getGrupoController().buscarNome(nomeGrupo);
-            boolean ok = mainFrame.getGrupoController().addParticipante(grupo, participante);
-
-            if (ok) return true;
-
-            // Grupo ficou cheio — atualiza lista
-            JOptionPane.showMessageDialog(this, "Grupo cheio! Escolha outro.");
-            gruposComVaga.clear();
-            for (Grupo g : mainFrame.getGrupoController().getGrupos())
-                if (g.getParticipantes().size() < 5) gruposComVaga.add(g);
-
-            if (gruposComVaga.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Todos os grupos estão cheios!");
-                mainFrame.setParticipanteLogado(null);
-                return false;
-            }
+        String[] nomesGrupos = new String[gruposComVaga.size()];
+        for (int i = 0; i < gruposComVaga.size(); i++) {
+            nomesGrupos[i] = gruposComVaga.get(i).getNome();
         }
+
+        String nomeEscolhido = (String) JOptionPane.showInputDialog(
+                this, "Escolha um grupo para continuar:",
+                "Escolha seu grupo",
+                JOptionPane.PLAIN_MESSAGE, null, nomesGrupos, nomesGrupos[0]);
+
+        if (nomeEscolhido == null) {
+            JOptionPane.showMessageDialog(this, "Você precisa entrar em um grupo!");
+            mainFrame.setParticipanteLogado(null);
+            return false;
+        }
+
+        Grupo grupo = mainFrame.getGrupoController().buscarNome(nomeEscolhido);
+        boolean ok = mainFrame.getGrupoController().addParticipante(grupo, participante);
+
+        if (!ok) {
+            JOptionPane.showMessageDialog(this, "Não foi possível entrar nesse grupo. Tente novamente.");
+            mainFrame.setParticipanteLogado(null);
+            return false;
+        }
+
+        return true;
     }
-    }
+}

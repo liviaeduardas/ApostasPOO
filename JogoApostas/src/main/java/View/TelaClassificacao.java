@@ -1,4 +1,5 @@
 package View;
+
 import Controller.ApostaController;
 import Controller.GrupoController;
 import Model.Grupo;
@@ -6,9 +7,12 @@ import Model.Participante;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class TelaClassificacao extends JPanel {
+
     private MainFrame main;
     private GrupoController grupoController;
     private ApostaController apostaController;
@@ -45,6 +49,7 @@ public class TelaClassificacao extends JPanel {
         add(new JScrollPane(areaRanking), BorderLayout.CENTER);
     }
 
+
     private void mostrarRanking() {
         areaRanking.setText("");
 
@@ -60,43 +65,41 @@ public class TelaClassificacao extends JPanel {
             return;
         }
 
-        List<Participante> semDuplicatas = new ArrayList<>();
-        List<Integer> idsVistos = new ArrayList<>();
-        for (Participante p : participantes) {
-            if (!idsVistos.contains(p.getId())) {
-                idsVistos.add(p.getId());
-                semDuplicatas.add(p);
-            }
-        }
+        List<Participante> ordenados = new ArrayList<>(participantes);
+        ordenados.sort(Comparator.comparingInt(this::getPontos).reversed());
 
-        semDuplicatas.sort((a, b) ->
-                apostaController.getTotalPontosPorParticipante(b)
-                        - apostaController.getTotalPontosPorParticipante(a));
-
-        for (int i = 0; i < semDuplicatas.size(); i++) {
-            Participante p = semDuplicatas.get(i);
-            int pontos = apostaController.getTotalPontosPorParticipante(p);
+        for (int i = 0; i < ordenados.size(); i++) {
+            Participante p = ordenados.get(i);
+            int pontos = getPontos(p);
             areaRanking.append((i + 1) + "º  " + p.getNome() + "  —  " + pontos + " pontos\n");
         }
+    }
+
+    private int getPontos(Participante p) {
+        return apostaController.getTotalPontosPorParticipante(p);
     }
 
     public void atualizar() {
         comboGrupo.removeAllItems();
 
-        Participante participante = main.getParticipanteLocalizado();
-        if (participante == null) return;
+        Participante participanteLogado = main.getParticipanteLocalizado();
+        if (participanteLogado == null) return;
 
         for (Grupo g : grupoController.getGrupos()) {
-            Grupo grupoAtualizado = grupoController.buscarNome(g.getNome());
-            if (grupoAtualizado == null) continue;
-            for (Participante p : grupoAtualizado.getParticipantes()) {
-                if (p.getId() == participante.getId()) {
-                    comboGrupo.addItem(g.getNome());
-                    break;
-                }
+            if (participanteEstaNoGrupo(participanteLogado, g)) {
+                comboGrupo.addItem(g.getNome());
             }
         }
 
         mostrarRanking();
+    }
+
+    private boolean participanteEstaNoGrupo(Participante participante, Grupo grupo) {
+        for (Participante p : grupo.getParticipantes()) {
+            if (p.getId() == participante.getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
