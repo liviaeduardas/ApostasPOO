@@ -44,8 +44,6 @@ public class CampeonatoRepository {
         try {
             List<Campeonato> lista = entityManager.createQuery(
                             "SELECT DISTINCT c FROM Campeonato c " +
-                                    "LEFT JOIN FETCH c.clubes " +
-                                    "LEFT JOIN FETCH c.partidas " +
                                     "WHERE LOWER(c.nome) = LOWER(:n)", Campeonato.class)
                     .setParameter("n", nome.trim())
                     .getResultList();
