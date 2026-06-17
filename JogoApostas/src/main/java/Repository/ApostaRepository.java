@@ -8,34 +8,32 @@ import java.util.List;
 
 public class ApostaRepository {
 
-    // Salva uma aposta nova no banco (INSERT)
+
     public boolean salvarAposta(Aposta aposta) {
-        // abre sessão com o banco
+
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
-            entityManager.getTransaction().begin(); // começa a operação
-            entityManager.persist(aposta);          // salva no banco
-            entityManager.getTransaction().commit();// confirma
+            entityManager.getTransaction().begin();
+            entityManager.persist(aposta);
+            entityManager.getTransaction().commit();
             return true;
         } catch (Exception e) {
-            entityManager.getTransaction().rollback(); // desfaz se deu erro
             System.out.println("Erro ao salvar aposta: " + e.getMessage());
             return false;
         } finally {
-            entityManager.close(); // sempre fecha a sessão
+            entityManager.close();
         }
     }
 
-    // Atualiza uma aposta existente no banco (UPDATE)
+
     public boolean atualizarAposta(Aposta aposta) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
             entityManager.getTransaction().begin();
-            entityManager.merge(aposta); // merge = atualiza no banco
+            entityManager.merge(aposta);
             entityManager.getTransaction().commit();
             return true;
         } catch (Exception e) {
-            entityManager.getTransaction().rollback();
             System.out.println("Erro ao atualizar aposta: " + e.getMessage());
             return false;
         } finally {
@@ -43,32 +41,31 @@ public class ApostaRepository {
         }
     }
 
-    // Busca todas as apostas de um participante específico (SELECT com filtro)
+
     public List<Aposta> buscarParticipante(Participante participante) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
             return entityManager.createQuery(
-                            "SELECT a FROM Aposta a WHERE a.participante = :p",
-                            Aposta.class) //Define que a consulta retornará objetos do tipo Aposta.
-                    .setParameter("p", participante) //Substitui o parâmetro :p pelo objeto armazenado na variável participante.
-                    .getResultList(); // executa consulta e retorna uma lista
+                            "SELECT a FROM Aposta a WHERE a.participante = :p", Aposta.class)
+                    .setParameter("p", participante)
+                    .getResultList();
         } catch (Exception e) {
             System.out.println("Erro ao buscar apostas: " + e.getMessage());
-            return List.of(); // retorna lista vazia se der erro
+            return List.of();
         } finally {
             entityManager.close();
         }
     }
 
-    // Busca todas as apostas de uma partida pelo id da partida
+
     public List<Aposta> buscarPartida(int partidaId) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
             return entityManager.createQuery(
                             "SELECT a FROM Aposta a " +
-                                    "JOIN FETCH a.participante " + // tras aposta e participante junto
-                                    "JOIN FETCH a.partida " + // tras partida também
-                                    "WHERE a.partida.id = :id", Aposta.class) //Retorna apenas as apostas da partida informada.
+                                    "JOIN FETCH a.participante " +
+                                    "JOIN FETCH a.partida " +
+                                    "WHERE a.partida.id = :id", Aposta.class)
                     .setParameter("id", partidaId)
                     .getResultList();
         } catch (Exception e) {
@@ -79,7 +76,7 @@ public class ApostaRepository {
         }
     }
 
-    // Busca todas as apostas do banco sem filtro (SELECT *)
+
     public List<Aposta> buscarTodasApostas() {
         EntityManager em = JPAUtil.getEntityManager();
         try {

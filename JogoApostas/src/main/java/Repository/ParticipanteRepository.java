@@ -3,37 +3,27 @@ package Repository;
 import Model.Participante;
 import Util.JPAUtil;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import java.util.List;
 
-/**
- * Responsável por salvar e buscar Participantes no banco de dados.
- * Toda operação com banco usa um EntityManager — é como uma sessão com o banco.
- */
+
 public class ParticipanteRepository {
 
-    /**
-     * Salva um novo participante no banco.
-     */
     public boolean salvarParticipante(Participante participante) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
             entityManager.getTransaction().begin();
-            entityManager.persist(participante); // persist = INSERT no banco
+            entityManager.persist(participante);
             entityManager.getTransaction().commit();
             return true;
         } catch (Exception e) {
-            entityManager.getTransaction().rollback(); // se der erro, desfaz tudo
             System.out.println("Erro ao salvar participante: " + e.getMessage());
             return false;
         } finally {
-            entityManager.close(); // sempre fecha o EntityManager no final
+            entityManager.close();
         }
     }
 
-    /**
-     * Retorna todos os participantes cadastrados.
-     */
+
     public List<Participante> buscarTodosParticipante() {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
@@ -46,19 +36,14 @@ public class ParticipanteRepository {
         }
     }
 
-    /**
-     * Atualiza os dados de um participante já existente no banco.
-     */
     public boolean atualizarParticipante(Participante participante) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
             entityManager.getTransaction().begin();
-
-            entityManager.merge(participante); // merge = UPDATE no banco
+            entityManager.merge(participante);
             entityManager.getTransaction().commit();
             return true;
         } catch (Exception e) {
-            entityManager.getTransaction().rollback();
             System.out.println("Erro ao atualizar participante: " + e.getMessage());
             return false;
         } finally {
@@ -66,7 +51,7 @@ public class ParticipanteRepository {
         }
     }
 
-    // Busca participante pelo nome de usuário
+
     public Participante buscarPorUsuario(String usuario) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
@@ -74,7 +59,11 @@ public class ParticipanteRepository {
                     "SELECT p FROM Participante p WHERE LOWER(p.usuario) = LOWER(:usuario)",
                     Participante.class
             ).setParameter("usuario", usuario.trim()).getResultList();
-            return resultado.isEmpty() ? null : resultado.get(0);
+
+            if (resultado.isEmpty()) {
+                return null;
+            }
+            return resultado.get(0);
         } catch (Exception e) {
             System.out.println("Erro ao buscar participante: " + e.getMessage());
             return null;
@@ -83,7 +72,7 @@ public class ParticipanteRepository {
         }
     }
 
-    // Busca participante pelo usuário E senha — usado no login
+
     public Participante buscarPorUsuarioESenha(String usuario, String senha) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
@@ -93,7 +82,11 @@ public class ParticipanteRepository {
                     ).setParameter("usuario", usuario.trim())
                     .setParameter("senha", senha.trim())
                     .getResultList();
-            return resultado.isEmpty() ? null : resultado.get(0);
+
+            if (resultado.isEmpty()) {
+                return null;
+            }
+            return resultado.get(0);
         } catch (Exception e) {
             System.out.println("Erro ao buscar participante: " + e.getMessage());
             return null;

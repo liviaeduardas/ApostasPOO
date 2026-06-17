@@ -5,14 +5,9 @@
              https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
              version="3.0">
 
-    <!-- Arquivo de configuração do hibernate -->
 
-    <!-- grupo de configurações com um nome.
-    O nome JogoApostasPU vai ser usado no código Java para iniciar o Hibernate.
-    RESOURCE_LOCAL significa que você controla as transações manualmente no código, sem servidor de aplicação -->
     <persistence-unit name="JogoApostasPU" transaction-type="RESOURCE_LOCAL">
 
-        <!-- ===== Entidades que o Hibernate deve gerenciar ===== -->
         <class>Model.Usuario</class>
         <class>Model.Administrador</class>
         <class>Model.Participante</class>
@@ -22,21 +17,21 @@
         <class>Model.Aposta</class>
         <class>Model.Grupo</class>
 
-        <!-- Impede o Hibernate de tentar adivinhar outras classes no classpath -->
+
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
-            <!-- Conexão com o banco -->
+
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="jakarta.persistence.jdbc.url"
                       value="jdbc:mysql://localhost:3306/db_jogoapostas?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true"/>
             <property name="jakarta.persistence.jdbc.user" value="usuario_jogoPOO"/>
-            <property name="jakarta.persistence.jdbc.password" value="S$nh@Mu!t0F0rt$!"/> <!-- senha como variável de ambiente -->
+            <property name="jakarta.persistence.jdbc.password" value="S$nh@Mu!t0F0rt$!"/>
 
-            <!-- Hibernate -->
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/> <!-- Mostra pro hibernate que o banco-->
-            <property name="hibernate.hbm2ddl.auto" value="update"/> <!--  Diz o que o Hibernate faz com as tabelas ao iniciar: atualiza -->
-            <property name="hibernate.show_sql" value="true"/> <!-- Mostra no console o SQL que o Hibernate está executando, formatado e legível. -->
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
         </properties>
 
