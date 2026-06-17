@@ -44,7 +44,7 @@ public class TelaCadastro extends JPanel implements ActionListener {
     private JComboBox<String> comboClubeAssociar;
     private JButton btnAssociarClube;
     private JComboBox<String> comboCampPartida;
-    private JComboBox<String> comboMandante;
+    private JComboBox<String> comboCasa;
     private JComboBox<String> comboVisitante;
     private JSpinner spinnerData;
     private JSpinner spinnerHora;
@@ -98,7 +98,6 @@ public class TelaCadastro extends JPanel implements ActionListener {
         menu.add(btnResultado);
         menu.add(btnGrupo);
         menu.add(btnSair);
-
         add(menu, BorderLayout.WEST);
     }
 
@@ -307,7 +306,7 @@ public class TelaCadastro extends JPanel implements ActionListener {
         JPanel p = form();
 
         comboCampPartida = new JComboBox<>();
-        comboMandante = new JComboBox<>();
+        comboCasa = new JComboBox<>();
         comboVisitante = new JComboBox<>();
         comboCampPartida.addActionListener(this);
         SpinnerDateModel modeloData = new SpinnerDateModel();
@@ -321,7 +320,7 @@ public class TelaCadastro extends JPanel implements ActionListener {
         p.add(new JLabel("Campeonato:"));
         p.add(comboCampPartida);
         p.add(new JLabel("Casa:"));
-        p.add(comboMandante);
+        p.add(comboCasa);
         p.add(new JLabel("Visitante:"));
         p.add(comboVisitante);
         p.add(new JLabel("Data:"));
@@ -343,7 +342,7 @@ public class TelaCadastro extends JPanel implements ActionListener {
     }
 
     private void carregarClubesDoCampeonato() {
-        comboMandante.removeAllItems();
+        comboCasa.removeAllItems();
         comboVisitante.removeAllItems();
 
         Campeonato camp = campeonatoController.procurarCampeonato(
@@ -351,7 +350,7 @@ public class TelaCadastro extends JPanel implements ActionListener {
         if (camp == null) return;
 
         for (Clube c : camp.getClubes()) {
-            comboMandante.addItem(c.getNome());
+            comboCasa.addItem(c.getNome());
             comboVisitante.addItem(c.getNome());
         }
     }
@@ -364,7 +363,7 @@ public class TelaCadastro extends JPanel implements ActionListener {
             return;
         }
 
-        Clube casa = buscarClubeNoCampeonato(camp, (String) comboMandante.getSelectedItem());
+        Clube casa = buscarClubeNoCampeonato(camp, (String) comboCasa.getSelectedItem());
         Clube visitante = buscarClubeNoCampeonato(camp, (String) comboVisitante.getSelectedItem());
 
         if (casa == null || visitante == null) {
