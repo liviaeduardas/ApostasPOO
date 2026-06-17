@@ -1,35 +1,35 @@
 package View;
-
 import Controller.ApostaController;
 import Controller.CampeonatoController;
 import Controller.GrupoController;
 import Model.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TelaApostas extends JPanel {
-
+public class TelaApostas extends JPanel implements ActionListener {
     private MainFrame main;
     private ApostaController apostaController;
     private CampeonatoController campeonatoController;
-
     private JComboBox<String> comboCampeonato;
     private JComboBox<String> comboPartida;
-    private JLabel labelMandante;
+    private JLabel labelCasa;
     private JLabel labelVisitante;
     private JLabel labelData;
     private JLabel labelHora;
     private JTextField txtGolsCasa;
     private JTextField txtGolsVisitante;
-
+    private JButton botaoApostar;
+    private JButton botaoVerResultados;
+    private JButton botaoVerClassificacao;
+    private JButton botaoSair;
 
     private final List<Partida> partidasExibidas = new ArrayList<>();
 
-    public TelaApostas(MainFrame main, ApostaController apostaController,
-                       CampeonatoController campeonatoController,
-                       GrupoController grupoController) {
+    public TelaApostas(MainFrame main, ApostaController apostaController, CampeonatoController campeonatoController, GrupoController grupoController) {
         this.main = main;
         this.apostaController = apostaController;
         this.campeonatoController = campeonatoController;
@@ -37,28 +37,24 @@ public class TelaApostas extends JPanel {
         setLayout(new GridLayout(0, 1, 5, 5));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-
         add(new JLabel("Campeonato:"));
         comboCampeonato = new JComboBox<>();
-        comboCampeonato.addActionListener(e -> carregarPartidas());
+        comboCampeonato.addActionListener(this);
         add(comboCampeonato);
-
 
         add(new JLabel("Partida:"));
         comboPartida = new JComboBox<>();
-        comboPartida.addActionListener(e -> atualizarNomeTimes());
+        comboPartida.addActionListener(this);
         add(comboPartida);
 
-
-        labelMandante = new JLabel("Time da casa: -");
+        labelCasa = new JLabel("Time da casa: -");
         labelVisitante = new JLabel("Time visitante: -");
         labelData = new JLabel("Data: -");
         labelHora = new JLabel("Hora: -");
-        add(labelMandante);
+        add(labelCasa);
         add(labelVisitante);
         add(labelData);
         add(labelHora);
-
 
         add(new JLabel("Gols casa:"));
         txtGolsCasa = new JTextField();
@@ -68,45 +64,67 @@ public class TelaApostas extends JPanel {
         txtGolsVisitante = new JTextField();
         add(txtGolsVisitante);
 
-        JButton apostar = new JButton("Apostar");
-        apostar.addActionListener(e -> fazerAposta());
-        add(apostar);
+        botaoApostar = new JButton("Apostar");
+        botaoApostar.addActionListener(this);
+        add(botaoApostar);
 
-        JButton verResultados = new JButton("Ver Resultados");
-        verResultados.addActionListener(e -> main.trocarTela("telaResultados"));
-        add(verResultados);
+        botaoVerResultados = new JButton("Ver Resultados");
+        botaoVerResultados.addActionListener(this);
+        add(botaoVerResultados);
 
-        JButton verClassificacao = new JButton("Ver Classificação");
-        verClassificacao.addActionListener(e -> main.trocarTela("telaClassificacao"));
-        add(verClassificacao);
+        botaoVerClassificacao = new JButton("Ver Classificação");
+        botaoVerClassificacao.addActionListener(this);
+        add(botaoVerClassificacao);
 
-        JButton sair = new JButton("Sair");
-        sair.addActionListener(e -> main.trocarTela("telaLogin"));
-        add(sair);
+        botaoSair = new JButton("Sair");
+        botaoSair.addActionListener(this);
+        add(botaoSair);
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        if (e.getSource() == comboCampeonato) {
+            carregarPartidas();
+
+        } else if (e.getSource() == comboPartida) {
+            atualizarNomeTimes();
+
+        } else if (e.getSource() == botaoApostar) {
+            fazerAposta();
+
+        } else if (e.getSource() == botaoVerResultados) {
+            main.trocarTela("telaResultados");
+
+        } else if (e.getSource() == botaoVerClassificacao) {
+            main.trocarTela("telaClassificacao");
+
+        } else if (e.getSource() == botaoSair) {
+            main.trocarTela("telaLogin");
+        }
+    }
 
     private void atualizarNomeTimes() {
         Partida partida = getPartidaSelecionada();
 
         if (partida == null) {
-            labelMandante.setText("Time da casa: -");
+            labelCasa.setText("Time da casa: -");
             labelVisitante.setText("Time visitante: -");
             labelData.setText("Data: -");
             labelHora.setText("Hora: -");
             return;
         }
 
-        labelMandante.setText("Time da casa: " + partida.getClubeCasa().getNome());
+        labelCasa.setText("Time da casa: " + partida.getClubeCasa().getNome());
         labelVisitante.setText("Time visitante: " + partida.getClubeVisitante().getNome());
         labelData.setText("Data: " + partida.getDataPartida());
         labelHora.setText("Hora: " + partida.getHoraPartida());
     }
 
     private void fazerAposta() {
-        Participante participante = main.getParticipanteLogado();
+        Participante participante = main.getParticipanteLocalizado();
         if (participante == null) {
-            JOptionPane.showMessageDialog(this, "Nenhum participante logado.");
+            JOptionPane.showMessageDialog(this, "Nenhum participante localizado.");
             return;
         }
 
@@ -135,7 +153,7 @@ public class TelaApostas extends JPanel {
                 JOptionPane.showMessageDialog(this,
                         "Não foi possível apostar.\nVerifique se já apostou nessa partida ou se o prazo encerrou.");
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Digite valores numéricos para os gols.");
         }
     }
@@ -160,7 +178,6 @@ public class TelaApostas extends JPanel {
         atualizarNomeTimes();
     }
 
-
     private Partida getPartidaSelecionada() {
         int indice = comboPartida.getSelectedIndex();
         if (indice < 0 || indice >= partidasExibidas.size()) {
@@ -168,7 +185,6 @@ public class TelaApostas extends JPanel {
         }
         return partidasExibidas.get(indice);
     }
-
 
     public void atualizar() {
         comboCampeonato.removeAllItems();

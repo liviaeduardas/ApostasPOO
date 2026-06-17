@@ -12,7 +12,7 @@ public class Administrador extends Usuario {
         super();
     }
 
-    public Administrador(String senha, String usuario, String nome) {
+    public Administrador(String senha, String usuario, String nome){
         super(senha, usuario, nome);
     }
 

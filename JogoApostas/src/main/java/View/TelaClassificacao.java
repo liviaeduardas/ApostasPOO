@@ -89,7 +89,7 @@ public class TelaClassificacao extends JPanel {
     public void atualizar() {
         comboGrupo.removeAllItems();
 
-        Participante participante = main.getParticipanteLogado();
+        Participante participante = main.getParticipanteLocalizado();
         if (participante == null) return;
 
         // Mostra só os grupos que o participante pertence

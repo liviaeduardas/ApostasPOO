@@ -43,20 +43,13 @@ public class UsuarioController {
             return false;
         }
 
-        if (usuarioJaExiste(usuario)){
+        if (participanteRepository.buscarPorUsuario(usuario) != null) {
             return false;
         }
 
-        Participante novo = new Participante();
-        novo.setNome(nome.trim());
-        novo.setUsuario(usuario.trim());
-        novo.setSenha(senha.trim());
+        Participante novo = new Participante(nome.trim(), usuario.trim(), senha.trim());
 
         return participanteRepository.salvarParticipante(novo);
-    }
-
-    public boolean usuarioJaExiste(String usuario) {
-        return participanteRepository.buscarPorUsuario(usuario) != null;
     }
 
     public Participante buscarNome(String nome) {

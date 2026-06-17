@@ -58,7 +58,7 @@ public class CampeonatoController {
         if (campeonato == null) {
             return new ArrayList<>();
         }
-        List<Partida> pendentes = new java.util.ArrayList<>();
+        List<Partida> pendentes = new ArrayList<>();
         for (Partida p : campeonato.getPartidas()) {
             if (!p.isPartidaFinalizada()) pendentes.add(p);
         }

@@ -43,30 +43,30 @@ public class PartidaController {
         return adicionou;
     }
 
-    public boolean addResultado(Partida partida, int golsCasa, int golsVisitante) {
+    public boolean addResultado(Partida partida, int GolsCasa, int GolsVisitante) {
         if (partida == null){
             return false;
         }
         if (partida.isPartidaFinalizada()){
             return false;
         }
-        if (golsCasa < 0 || golsVisitante < 0){
+        if (GolsCasa < 0 || GolsVisitante < 0){
             return false;
         }
 
-        partida.resultadoFinal(golsCasa, golsVisitante);
+        partida.resultadoFinal(GolsCasa, GolsVisitante);
         campeonatoRepository.atualizarCampeonato(partida.getCampeonato());
 
         try {
             List<Aposta> apostas = apostaRepository.buscarPartida(partida.getId());
             for (Aposta a : apostas) {
-                a.getPartida().resultadoFinal(golsCasa, golsVisitante);
                 a.calcularResultadoAposta();
                 apostaRepository.atualizarAposta(a);
                 participanteRepository.atualizarParticipante(a.getParticipante());
             }
         } catch (Exception e) {
-            System.out.println("Erro ao calcular pontos: " + e.getMessage());
+            System.out.println("Erro ao calcular pontos das apostas: " + e.getMessage());
+            return false;
         }
         return true;
     }
