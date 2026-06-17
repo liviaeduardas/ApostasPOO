@@ -47,7 +47,7 @@ public class UsuarioController {
             return false;
         }
 
-        Participante novo = new Participante(nome.trim(), usuario.trim(), senha.trim());
+        Participante novo = new Participante(senha.trim(), usuario.trim(), nome.trim());
 
         return participanteRepository.salvarParticipante(novo);
     }
