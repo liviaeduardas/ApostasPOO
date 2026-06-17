@@ -38,11 +38,16 @@ public class ApostaController {
     }
 
     public void CalcularPontos(Campeonato campeonato) {
-        for (Aposta aposta : apostaRepository.buscarTodasApostas()) {
-            if (campeonato.getPartidas().contains(aposta.getPartida()) && aposta.getPartida().isPartidaFinalizada()) {
-                aposta.calcularResultadoAposta();
-                apostaRepository.atualizarAposta(aposta);
-                participanteRepository.atualizarParticipante(aposta.getParticipante());
+        for (Partida partida : campeonato.getPartidas()) {
+            if (!partida.isPartidaFinalizada())
+                continue;
+
+            for (Aposta aposta : apostaRepository.buscarTodasApostas()) {
+                if (aposta.getPartida() == partida) {
+                    aposta.calcularResultadoAposta();
+                    apostaRepository.atualizarAposta(aposta);
+                    participanteRepository.atualizarParticipante(aposta.getParticipante());
+                }
             }
         }
     }

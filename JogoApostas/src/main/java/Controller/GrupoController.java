@@ -32,8 +32,9 @@ public class GrupoController {
     }
 
     public boolean addParticipante(Grupo grupo, Participante participante) {
-        if (grupo == null || participante == null)
+        if (grupo == null || participante == null) {
             return false;
+        }
         boolean adicionou = grupo.addParticipante(participante);
         if (adicionou) {
             grupoRepository.atualizarGrupo(grupo);

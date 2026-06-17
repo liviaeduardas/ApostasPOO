@@ -68,7 +68,7 @@ public class MainFrame extends JFrame {
         }
     }
 
-    public Participante getParticipanteLogado(){
+    public Participante getParticipanteLocalizado(){
         return participanteLogado;
     }
 
