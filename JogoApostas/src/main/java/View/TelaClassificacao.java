@@ -1,5 +1,4 @@
 package View;
-
 import Controller.ApostaController;
 import Controller.GrupoController;
 import Model.Grupo;
@@ -10,17 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TelaClassificacao extends JPanel {
-
-    private MainFrame        main;
-    private GrupoController  grupoController;
+    private MainFrame main;
+    private GrupoController grupoController;
     private ApostaController apostaController;
     private JComboBox<String> comboGrupo;
-    private JTextArea         areaRanking;
+    private JTextArea areaRanking;
 
-    public TelaClassificacao(MainFrame main, GrupoController grupoController,
-                             ApostaController apostaController) {
-        this.main             = main;
-        this.grupoController  = grupoController;
+    public TelaClassificacao(MainFrame main, GrupoController grupoController, ApostaController apostaController) {
+        this.main = main;
+        this.grupoController = grupoController;
         this.apostaController = apostaController;
 
         setLayout(new BorderLayout(5, 5));
@@ -57,14 +54,12 @@ public class TelaClassificacao extends JPanel {
         Grupo grupo = grupoController.buscarNome(nomeGrupo);
         if (grupo == null) return;
 
-        // Busca participantes diretamente do grupo — sem acessar lista lazy
         List<Participante> participantes = grupo.getParticipantes();
         if (participantes.isEmpty()) {
             areaRanking.append("Nenhum participante neste grupo ainda.\n");
             return;
         }
 
-        // Remove duplicatas por id antes de ordenar
         List<Participante> semDuplicatas = new ArrayList<>();
         List<Integer> idsVistos = new ArrayList<>();
         for (Participante p : participantes) {
@@ -74,7 +69,6 @@ public class TelaClassificacao extends JPanel {
             }
         }
 
-        // Ordena por pontos (maior primeiro) — pontos calculados via apostas no banco
         semDuplicatas.sort((a, b) ->
                 apostaController.getTotalPontosPorParticipante(b)
                         - apostaController.getTotalPontosPorParticipante(a));
@@ -92,7 +86,6 @@ public class TelaClassificacao extends JPanel {
         Participante participante = main.getParticipanteLocalizado();
         if (participante == null) return;
 
-        // Mostra só os grupos que o participante pertence
         for (Grupo g : grupoController.getGrupos()) {
             Grupo grupoAtualizado = grupoController.buscarNome(g.getNome());
             if (grupoAtualizado == null) continue;

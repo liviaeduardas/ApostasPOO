@@ -17,21 +17,25 @@ public class ApostaController {
     }
 
     public boolean FazerAposta(Participante participante, Partida partida, int GolsCasa, int GolsVisitante){
-        if (participante == null || partida == null)
+        if (participante == null || partida == null) {
             return false;
-        if (GolsCasa < 0 || GolsVisitante < 0)
+        }
+        if (GolsCasa < 0 || GolsVisitante < 0) {
             return false;
-        if (partida.isPartidaFinalizada())
+        }
+        if (partida.isPartidaFinalizada()) {
             return false;
+        }
 
         Aposta aposta = new Aposta(participante, partida, GolsCasa, GolsVisitante);
 
-        if (!aposta.possivelApostar())
+        if (!aposta.possivelApostar()) {
             return false;
-
+        }
         for (Aposta a : apostaRepository.buscarParticipante(participante)) {
-            if (a.getPartida() == partida)
+            if (a.getPartida() == partida) {
                 return false;
+            }
         }
         participante.fazerAposta(aposta);
         return apostaRepository.salvarAposta(aposta);
@@ -39,9 +43,9 @@ public class ApostaController {
 
     public void CalcularPontos(Campeonato campeonato) {
         for (Partida partida : campeonato.getPartidas()) {
-            if (!partida.isPartidaFinalizada())
+            if (!partida.isPartidaFinalizada()) {
                 continue;
-
+            }
             for (Aposta aposta : apostaRepository.buscarTodasApostas()) {
                 if (aposta.getPartida() == partida) {
                     aposta.calcularResultadoAposta();

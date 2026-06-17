@@ -40,7 +40,9 @@ public class CampeonatoController {
             return false;
         }
         boolean adicionou = campeonato.addCLube(clube);
-        if (adicionou) campeonatoRepository.atualizarCampeonato(campeonato);
+        if (adicionou){
+            campeonatoRepository.atualizarCampeonato(campeonato);
+        }
         return adicionou;
     }
 
@@ -49,8 +51,9 @@ public class CampeonatoController {
             return false;
         }
         boolean adicionou = campeonato.addPartida(partida);
-        if (adicionou)
+        if (adicionou) {
             campeonatoRepository.atualizarCampeonato(campeonato);
+        }
         return adicionou;
     }
 
