@@ -58,6 +58,8 @@ public class TelaCadastro extends JPanel implements ActionListener {
     private JTextField txtNomeGrupo;
     private JButton btnCriarGrupo;
 
+    private static final String VAZIO = "";
+
     public TelaCadastro(MainFrame main, CampeonatoController campeonatoController, PartidaController partidaController) {
         this.main = main;
         this.campeonatoController = campeonatoController;
@@ -273,6 +275,10 @@ public class TelaCadastro extends JPanel implements ActionListener {
         comboClubeAssociar.removeAllItems();
         clubesExibidosAssociar.clear();
 
+        // item vazio para não vir nada pré-selecionado
+        comboCampAssociar.addItem(VAZIO);
+        comboClubeAssociar.addItem(VAZIO);
+
         for (Campeonato c : campeonatoController.getCampeonatos())
             comboCampAssociar.addItem(c.getNome());
 
@@ -283,14 +289,19 @@ public class TelaCadastro extends JPanel implements ActionListener {
     }
 
     private void associarClubeAoCampeonato() {
-        Campeonato camp = campeonatoController.procurarCampeonato(
-                (String) comboCampAssociar.getSelectedItem());
+        String nomeCamp = (String) comboCampAssociar.getSelectedItem();
+        if (nomeCamp == null || nomeCamp.isEmpty()) {
+            msg("Selecione um campeonato!");
+            return;
+        }
+
+        Campeonato camp = campeonatoController.procurarCampeonato(nomeCamp);
         if (camp == null) {
             msg("Selecione um campeonato!");
             return;
         }
 
-        int indiceClube = comboClubeAssociar.getSelectedIndex();
+        int indiceClube = comboClubeAssociar.getSelectedIndex() - 1;
         if (indiceClube < 0 || indiceClube >= clubesExibidosAssociar.size()) {
             msg("Selecione um clube!");
             return;
@@ -337,6 +348,7 @@ public class TelaCadastro extends JPanel implements ActionListener {
 
     private void recarregarPartida() {
         comboCampPartida.removeAllItems();
+        comboCampPartida.addItem(VAZIO);
         for (Campeonato c : campeonatoController.getCampeonatos())
             comboCampPartida.addItem(c.getNome());
     }
@@ -345,8 +357,10 @@ public class TelaCadastro extends JPanel implements ActionListener {
         comboCasa.removeAllItems();
         comboVisitante.removeAllItems();
 
-        Campeonato camp = campeonatoController.procurarCampeonato(
-                (String) comboCampPartida.getSelectedItem());
+        String nomeCamp = (String) comboCampPartida.getSelectedItem();
+        if (nomeCamp == null || nomeCamp.isEmpty()) return;
+
+        Campeonato camp = campeonatoController.procurarCampeonato(nomeCamp);
         if (camp == null) return;
 
         for (Clube c : camp.getClubes()) {
@@ -356,8 +370,13 @@ public class TelaCadastro extends JPanel implements ActionListener {
     }
 
     private void cadastrarPartida() {
-        Campeonato camp = campeonatoController.procurarCampeonato(
-                (String) comboCampPartida.getSelectedItem());
+        String nomeCamp = (String) comboCampPartida.getSelectedItem();
+        if (nomeCamp == null || nomeCamp.isEmpty()) {
+            msg("Selecione um campeonato!");
+            return;
+        }
+
+        Campeonato camp = campeonatoController.procurarCampeonato(nomeCamp);
         if (camp == null) {
             msg("Selecione um campeonato!");
             return;
@@ -423,6 +442,7 @@ public class TelaCadastro extends JPanel implements ActionListener {
 
     private void recarregarResultado() {
         comboCampResultado.removeAllItems();
+        comboCampResultado.addItem(VAZIO);
         for (Campeonato c : campeonatoController.getCampeonatos())
             comboCampResultado.addItem(c.getNome());
     }
@@ -431,8 +451,10 @@ public class TelaCadastro extends JPanel implements ActionListener {
         comboPartidaResultado.removeAllItems();
         partidasPendentesExibidas.clear();
 
-        Campeonato camp = campeonatoController.procurarCampeonato(
-                (String) comboCampResultado.getSelectedItem());
+        String nomeCamp = (String) comboCampResultado.getSelectedItem();
+        if (nomeCamp == null || nomeCamp.isEmpty()) return;
+
+        Campeonato camp = campeonatoController.procurarCampeonato(nomeCamp);
         if (camp == null) return;
 
         for (Partida pt : camp.getPartidas()) {
