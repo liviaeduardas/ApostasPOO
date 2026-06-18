@@ -4,41 +4,32 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!--Arquivo de configuração do maven - descreve tudo do projeto-->
 
-    <!-- Identificação do projeto: É o "sobrenome" do projeto.
-    Normalmente usa-se o domínio da empresa, mas em projetos de estudo org.example é padrão.-->
     <groupId>org.example</groupId>
-    <artifactId>JogoApostas</artifactId>  <!--É com esse nome que o Maven identifica seu projeto-->
-    <version>1.0-SNAPSHOT</version> <!--A versão do projeto. SNAPSHOT significa que está em desenvolvimento-->
+    <artifactId>JogoApostas</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
 
-    <!--configurações gerais-->
+
     <properties>
-        <maven.compiler.source>23</maven.compiler.source>  <!--qual versão do java usar-->
+        <maven.compiler.source>23</maven.compiler.source>
         <maven.compiler.target>23</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!--evita problema de acento-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-
-    <!--Bibliotecas externas que o projeto precisa-->
     <dependencies>
-
-        <!-- Hibernate ORM — faz os objetos Java serem tabelas no banco de dados. -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>6.4.4.Final</version>
         </dependency>
 
-        <!-- JPA — interface padrão que o Hibernate implementa - conjunto de regras que define como um ORM deve funcionar em Java.-->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
         </dependency>
 
-        <!-- Conector MySQL — permite o Java se conectar ao banco -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>

@@ -33,7 +33,7 @@ public class ApostaController {
             return false;
         }
         for (Aposta a : apostaRepository.buscarApostasParticipante(participante)) {
-            if (a.getPartida() == partida) {
+            if (a.getPartida().getId() == partida.getId()){
                 return false;
             }
         }
