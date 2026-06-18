@@ -4,8 +4,6 @@ import java.time.LocalTime;
 import jakarta.persistence.*;
 
 @Entity
-
-
 public class Partida {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

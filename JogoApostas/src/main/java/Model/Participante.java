@@ -10,6 +10,10 @@ public class Participante extends Usuario{
     @OneToMany(mappedBy = "participante", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Aposta> apostas;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grupo_id")
+    private Grupo grupo;
+
     public Participante() {
         super();
         this.apostas = new ArrayList<>();
@@ -35,5 +39,13 @@ public class Participante extends Usuario{
 
     public void setApostas(List<Aposta> apostas){
         this.apostas = apostas;
+    }
+
+    public Grupo getGrupo(){
+        return grupo;
+    }
+
+    public void setGrupo(Grupo grupo){
+        this.grupo = grupo;
     }
 }
