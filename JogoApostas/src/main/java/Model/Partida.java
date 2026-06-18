@@ -34,7 +34,7 @@ public class Partida {
     @Column(name = "gol_visitante")
     private int GolsVisitante;
 
-    @Column(name = "encerrada")
+    @Column(name = "finalizada")
     private boolean PartidaFinalizada;
 
     public Partida() {

@@ -17,16 +17,16 @@ public class Aposta implements ICalcularPontos{
     @JoinColumn(name = "partida_id", nullable = false)
     private Partida partida;
 
-    @Column(name = "gols_casa_aposta", nullable = false)
+    @Column(name = "palpite_gols_casa", nullable = false)
     private int palpiteGolsCasa;
 
-    @Column(name = "gols_visitante_aposta", nullable = false)
+    @Column(name = "palpite_gols_visitante", nullable = false)
     private int palpiteGolsVsitante;
 
-    @Column(name = "data_hora_aposta")
+    @Column(name = "tempo_aposta")
     private LocalDateTime tempoApostar;
 
-    @Column(name = "pontuacao_obtida")
+    @Column(name = "pontos_obtidos")
     private int pontosObtidos;
 
     public Aposta(){
