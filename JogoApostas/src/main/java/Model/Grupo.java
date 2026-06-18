@@ -13,10 +13,7 @@ public class Grupo {
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "grupo_participantes",
-            joinColumns = @JoinColumn(name = "grupo_id"),
-            inverseJoinColumns = @JoinColumn(name = "participante_id"))
+    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Participante> participantes;
 
     public Grupo(){
@@ -34,6 +31,7 @@ public class Grupo {
             return false;
         }
         else{
+            participante.setGrupo(this);
             participantes.add(participante);
             return true;
         }
