@@ -29,10 +29,6 @@ public class Participante extends Usuario{
         apostas.add(aposta);
     }
 
-    public int getTotalPontos(){
-        return 0;
-    }
-
     public List<Aposta> getApostas(){
         return apostas;
     }

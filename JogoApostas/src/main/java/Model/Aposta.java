@@ -3,7 +3,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "apostas")
+
 public class Aposta implements ICalcularPontos{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +17,10 @@ public class Aposta implements ICalcularPontos{
     @JoinColumn(name = "partida_id", nullable = false)
     private Partida partida;
 
-    @Column(name = "gols_mandante_palpite", nullable = false)
+    @Column(name = "gols_casa_aposta", nullable = false)
     private int palpiteGolsCasa;
 
-    @Column(name = "gols_visitante_palpite", nullable = false)
+    @Column(name = "gols_visitante_aposta", nullable = false)
     private int palpiteGolsVsitante;
 
     @Column(name = "data_hora_aposta")
@@ -53,12 +53,12 @@ public class Aposta implements ICalcularPontos{
 
     private int getResultadoPalpitePartida() {
         if (palpiteGolsCasa > palpiteGolsVsitante){
-            return 1; //casa
+            return 1;
         }
         if (palpiteGolsCasa < palpiteGolsVsitante){
-            return 2; //visitante
+            return 2;
         }
-        return 0; //empate
+        return 0;
     }
 
     @Override

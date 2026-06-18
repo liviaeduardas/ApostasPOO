@@ -32,7 +32,7 @@ public class ApostaController {
         if (!aposta.possivelApostar()) {
             return false;
         }
-        for (Aposta a : apostaRepository.buscarParticipante(participante)) {
+        for (Aposta a : apostaRepository.buscarApostasParticipante(participante)) {
             if (a.getPartida() == partida) {
                 return false;
             }
@@ -41,7 +41,7 @@ public class ApostaController {
         return apostaRepository.salvarAposta(aposta);
     }
 
-    public void CalcularPontos(Campeonato campeonato) {
+    public void calcularpontos(Campeonato campeonato) {
         for (Partida partida : campeonato.getPartidas()) {
             if (!partida.isPartidaFinalizada()) {
                 continue;
@@ -58,14 +58,14 @@ public class ApostaController {
 
     public int getTotalPontosPorParticipante(Participante participante){
         int total = 0;
-        for (Aposta a : apostaRepository.buscarParticipante(participante)) {
+        for (Aposta a : apostaRepository.buscarApostasParticipante(participante)) {
             total += a.getPontosObtidos();
         }
         return total;
     }
 
     public List<Aposta> getApostasPorParticipante(Participante participante) {
-        return apostaRepository.buscarParticipante(participante);
+        return apostaRepository.buscarApostasParticipante(participante);
     }
 
     public List<Aposta> getApostas(){

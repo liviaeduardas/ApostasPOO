@@ -2,7 +2,7 @@ package Model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "clubes")
+
 
 public class Clube {
     @Id
