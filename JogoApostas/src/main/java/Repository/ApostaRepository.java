@@ -42,7 +42,7 @@ public class ApostaRepository {
     }
 
 
-    public List<Aposta> buscarParticipante(Participante participante) {
+    public List<Aposta> buscarApostasParticipante(Participante participante) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
             return entityManager.createQuery(
@@ -58,7 +58,7 @@ public class ApostaRepository {
     }
 
 
-    public List<Aposta> buscarPartida(int partidaId) {
+    public List<Aposta> buscarApostasPartida(int partidaId) {
         EntityManager entityManager = JPAUtil.getEntityManager();
         try {
             return entityManager.createQuery(

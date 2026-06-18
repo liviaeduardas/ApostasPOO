@@ -4,7 +4,7 @@ import java.time.LocalTime;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "partidas")
+
 
 public class Partida {
     @Id
@@ -15,7 +15,7 @@ public class Partida {
     private Campeonato campeonato;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "clube_mandante_id", nullable = false)
+    @JoinColumn(name = "clube_casa_id", nullable = false)
     private Clube ClubeCasa;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,7 +28,7 @@ public class Partida {
     @Column(name = "hora_partida", nullable = false)
     private LocalTime HoraPartida;
 
-    @Column(name = "gol_mandante")
+    @Column(name = "gol_casa")
     private int GolsCasa;
 
     @Column(name = "gol_visitante")
@@ -118,13 +118,13 @@ public class Partida {
 
     public int getResultado(){
         if (GolsCasa > GolsVisitante) {
-            return 1; //casa venceu
+            return 1;
         }
 
         if (GolsCasa < GolsVisitante) {
-            return 2; //visitante venceu
+            return 2;
         }
-        return 0; //empate
+        return 0;
     }
 
     public int getId() {

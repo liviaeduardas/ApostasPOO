@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "campeonatos")
 
 public class Campeonato {
     private static final int MAX_CLUBES = 8;
@@ -19,7 +18,9 @@ public class Campeonato {
     private int ano;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "campeonato_clubes", joinColumns = @JoinColumn(name = "campeonato_id"), inverseJoinColumns = @JoinColumn(name = "clube_id"))
+    @JoinTable(name = "campeonato_clubes",
+            joinColumns = @JoinColumn(name = "campeonato_id"),
+            inverseJoinColumns = @JoinColumn(name = "clube_id"))
     private List<Clube> clubes;
 
     @OneToMany(mappedBy = "campeonato", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

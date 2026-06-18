@@ -58,7 +58,7 @@ public class PartidaController {
         campeonatoRepository.atualizarCampeonato(partida.getCampeonato());
 
         try {
-            List<Aposta> apostas = apostaRepository.buscarPartida(partida.getId());
+            List<Aposta> apostas = apostaRepository.buscarApostasPartida(partida.getId());
             for (Aposta a : apostas) {
                 a.calcularResultadoAposta();
                 apostaRepository.atualizarAposta(a);

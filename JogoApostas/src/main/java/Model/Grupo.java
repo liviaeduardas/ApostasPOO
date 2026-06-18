@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "grupos")
 
 public class Grupo {
     @Id
@@ -15,7 +14,9 @@ public class Grupo {
     private String nome;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "grupo_participantes", joinColumns = @JoinColumn(name = "grupo_id"), inverseJoinColumns = @JoinColumn(name = "participante_id"))
+    @JoinTable(name = "grupo_participantes",
+            joinColumns = @JoinColumn(name = "grupo_id"),
+            inverseJoinColumns = @JoinColumn(name = "participante_id"))
     private List<Participante> participantes;
 
     public Grupo(){
